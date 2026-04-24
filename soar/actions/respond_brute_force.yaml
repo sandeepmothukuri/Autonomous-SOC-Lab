@@ -1,0 +1,24 @@
+---
+name: respond_brute_force
+pack: soc_lab
+description: Enrich a brute force source IP, decide on blocking, and create an IRIS case.
+runner_type: orquesta
+entry_point: workflows/auto_respond.yaml
+enabled: true
+parameters:
+  src_ip:
+    type: string
+    required: true
+  alert_name:
+    type: string
+    default: Brute Force Attack Detected
+    immutable: true
+  alert_id:
+    type: string
+    default: elastalert
+  severity:
+    type: string
+    default: high
+  count:
+    type: string
+    default: "0"

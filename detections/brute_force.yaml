@@ -1,0 +1,75 @@
+# =============================================================================
+# Detection: SSH / Windows Brute Force Attack
+# MITRE ATT&CK: T1110 — Brute Force
+# Severity: High
+# Author: SOC Lab
+# =============================================================================
+
+name: Brute Force Attack Detected
+type: frequency
+
+index: logs-*
+
+# Fire when 5+ failed logins in 2 minutes from same source IP
+num_events: 5
+timeframe:
+  minutes: 2
+
+# Group by source IP — detect per-attacker not global
+query_key: source.ip
+
+filter:
+  - term:
+      event.type: "failed_login"
+
+# Don't re-alert for same IP within 10 minutes
+realert:
+  minutes: 10
+
+# Where to send alerts
+alert:
+  - post
+
+http_post_url: "http://stackstorm:9101/v1/webhooks/elastalert"
+http_post_payload:
+  source_ip: source.ip
+  user_name: user.name
+  host_name: target.host
+  event_type: event.type
+  count: num_matches
+http_post_static_payload:
+  alert_name: "Brute Force Attack Detected"
+  alert_id: "brute-force-t1110"
+  severity: "high"
+  mitre_technique: "T1110"
+http_post_headers:
+  Content-Type: "application/json"
+  X-SOC-Source: "elastalert"
+
+# Alert body template
+alert_text: |
+  🚨 BRUTE FORCE ATTACK DETECTED
+
+  Source IP:  {source.ip}
+  Target:     {target.host}
+  Attempts:   {count} failed logins in 2 minutes
+  First seen: {first_hit_time}
+  Last seen:  {last_hit_time}
+
+  MITRE ATT&CK: T1110 (Brute Force)
+  Severity: HIGH
+
+  → Auto-response triggered: IP enrichment + block decision
+
+alert_text_type: alert_text_only
+
+# Include these fields in the alert
+include:
+  - source.ip
+  - user.name
+  - target.host
+  - event.type
+  - count
+
+# Timestamp field
+timestamp_field: "@timestamp"

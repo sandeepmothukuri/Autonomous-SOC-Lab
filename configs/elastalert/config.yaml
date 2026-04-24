@@ -1,0 +1,56 @@
+# ElastAlert2 Configuration
+# Autonomous SOC Lab
+
+# OpenSearch connection
+es_host: opensearch
+es_port: 9200
+es_username: ""
+es_password: ""
+use_ssl: false
+verify_certs: false
+
+# ElastAlert metadata index
+writeback_index: elastalert_status
+writeback_alias: elastalert_alerts
+
+# Rules directory
+rules_folder: /opt/elastalert/rules
+
+# Scan frequency — how often ElastAlert checks rules
+run_every:
+  seconds: 30
+
+# Buffer time — how far back to look for events on startup
+buffer_time:
+  minutes: 15
+
+# Alert time limit — suppress duplicate alerts
+alert_time_limit:
+  hours: 2
+
+# Logging
+log_level: INFO
+log_file: /var/log/elastalert/elastalert.log
+
+# Disable rules on error (false = keep trying)
+disable_rules_on_error: false
+
+# Max scrolling per rule per run
+max_scrolling_count: 990
+
+# Custom alert subject prefix
+alert_subject_prefix: "[SOC ALERT]"
+
+# Silence duration (per rule)
+old_query_limit:
+  weeks: 1
+
+# Timezone
+use_local_time: true
+
+# Metadata fields added to every alert
+add_metadata_alert: true
+
+# StackStorm webhook settings (referenced by rules)
+# Override per-rule with: alert: post
+# url: http://stackstorm:9101/v1/webhooks/elastalert

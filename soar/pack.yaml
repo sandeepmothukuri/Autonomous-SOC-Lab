@@ -1,0 +1,6 @@
+---
+name: soc_lab
+description: Autonomous SOC Lab response workflows and ElastAlert trigger rules.
+version: 0.1.0
+author: SOC Lab
+email: admin@soc.lab

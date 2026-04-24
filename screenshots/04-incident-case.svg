@@ -1,0 +1,185 @@
+<svg viewBox="0 0 1100 700" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI',Arial,sans-serif">
+  <rect width="1100" height="700" fill="#0d1117"/>
+  <!-- Header -->
+  <rect width="1100" height="48" fill="#161b22"/>
+  <rect x="0" y="48" width="1100" height="1" fill="#30363d"/>
+  <text x="20" y="30" fill="#58a6ff" font-size="15" font-weight="bold">⚡ Autonomous SOC Lab</text>
+  <text x="700" y="30" fill="#8b949e" font-size="12">DFIR-IRIS  v2.4.0  |  Case Management</text>
+
+  <!-- Sidebar -->
+  <rect x="0" y="48" width="200" height="652" fill="#161b22"/>
+  <rect x="200" y="48" width="1" height="652" fill="#30363d"/>
+  <text x="20" y="84" fill="#8b949e" font-size="11" font-weight="bold">CASES</text>
+  <rect x="0" y="90" width="200" height="30" fill="#1f6feb30"/>
+  <rect x="0" y="90" width="3" height="30" fill="#58a6ff"/>
+  <text x="15" y="110" fill="#58a6ff" font-size="12">IRN-2024-0089</text>
+  <text x="15" y="142" fill="#8b949e" font-size="12">IRN-2024-0088</text>
+  <text x="15" y="166" fill="#8b949e" font-size="12">IRN-2024-0087</text>
+  <text x="15" y="190" fill="#8b949e" font-size="12">IRN-2024-0086</text>
+  <text x="15" y="214" fill="#8b949e" font-size="12">IRN-2024-0085</text>
+  <rect x="10" y="228" width="180" height="1" fill="#30363d"/>
+  <text x="20" y="250" fill="#8b949e" font-size="11" font-weight="bold">QUICK ACTIONS</text>
+  <text x="20" y="274" fill="#58a6ff" font-size="12">+ New Case</text>
+  <text x="20" y="296" fill="#8b949e" font-size="12">📊 Reports</text>
+  <text x="20" y="318" fill="#8b949e" font-size="12">📋 Templates</text>
+  <text x="20" y="340" fill="#8b949e" font-size="12">🔍 Search</text>
+
+  <!-- Case header -->
+  <rect x="215" y="58" width="870" height="90" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="235" y="82" fill="#ffffff" font-size="18" font-weight="bold">Case IRN-2024-0089 — Brute Force + PowerShell Execution</text>
+  <rect x="235" y="92" width="70" height="20" rx="3" fill="#da3633"/>
+  <text x="270" y="106" fill="#fff" font-size="11" text-anchor="middle" font-weight="bold">CRITICAL</text>
+  <rect x="315" y="92" width="55" height="20" rx="3" fill="#1f6feb"/>
+  <text x="342" y="106" fill="#fff" font-size="11" text-anchor="middle">OPEN</text>
+  <rect x="380" y="92" width="80" height="20" rx="3" fill="#21262d"/>
+  <text x="420" y="106" fill="#8b949e" font-size="11" text-anchor="middle">IN PROGRESS</text>
+  <text x="235" y="132" fill="#8b949e" font-size="12">Created: 2024-03-15 14:28:38 UTC  |  Assigned: SOC Analyst (Auto)  |  SLA: 2h remaining</text>
+  <text x="900" y="95" fill="#8b949e" font-size="11">Severity: 9/10</text>
+  <rect x="870" y="100" width="195" height="10" rx="2" fill="#21262d"/>
+  <rect x="870" y="100" width="175" height="10" rx="2" fill="#da3633" opacity="0.7"/>
+
+  <!-- Main content: 2 columns -->
+  <!-- LEFT column -->
+  <!-- Evidence panel -->
+  <rect x="215" y="160" width="420" height="200" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <rect x="215" y="160" width="420" height="32" rx="6" fill="#21262d"/>
+  <text x="235" y="181" fill="#ffffff" font-size="13" font-weight="bold">🔍  Evidence &amp; Artifacts</text>
+
+  <!-- Evidence items -->
+  <rect x="225" y="202" width="400" height="28" rx="3" fill="#0d1117"/>
+  <text x="240" y="220" fill="#58a6ff" font-size="11">📄</text>
+  <text x="258" y="220" fill="#e6edf3" font-size="11">brute_force_events.json  (2.4 KB)</text>
+  <text x="560" y="220" fill="#3fb950" font-size="10">Imported</text>
+
+  <rect x="225" y="234" width="400" height="28" rx="3" fill="#161b22"/>
+  <text x="240" y="252" fill="#ffa198" font-size="11">🔴</text>
+  <text x="258" y="252" fill="#e6edf3" font-size="11">powershell_decoded_payload.txt</text>
+  <text x="560" y="252" fill="#3fb950" font-size="10">Imported</text>
+
+  <rect x="225" y="266" width="400" height="28" rx="3" fill="#0d1117"/>
+  <text x="240" y="284" fill="#d2a8ff" font-size="11">🧬</text>
+  <text x="258" y="284" fill="#e6edf3" font-size="11">sysmon_event_1_pid4928.evtx</text>
+  <text x="560" y="284" fill="#3fb950" font-size="10">Imported</text>
+
+  <rect x="225" y="298" width="400" height="28" rx="3" fill="#161b22"/>
+  <text x="240" y="316" fill="#f0883e" font-size="11">🌐</text>
+  <text x="258" y="316" fill="#e6edf3" font-size="11">ip_enrichment_185.220.101.47.json</text>
+  <text x="560" y="316" fill="#3fb950" font-size="10">Imported</text>
+
+  <rect x="225" y="330" width="400" height="22" rx="3" fill="#0d1117"/>
+  <text x="240" y="345" fill="#8b949e" font-size="11">🧪</text>
+  <text x="258" y="345" fill="#e6edf3" font-size="11">memory_dump_ws047.dmp  (512 MB)</text>
+  <text x="560" y="345" fill="#f0883e" font-size="10">Pending</text>
+
+  <!-- IOCs panel -->
+  <rect x="215" y="372" width="420" height="176" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <rect x="215" y="372" width="420" height="32" rx="6" fill="#21262d"/>
+  <text x="235" y="393" fill="#ffffff" font-size="13" font-weight="bold">☣  IOCs (Indicators of Compromise)</text>
+  <!-- Table header -->
+  <rect x="215" y="404" width="420" height="24" fill="#0d1117"/>
+  <text x="228" y="420" fill="#8b949e" font-size="10" font-weight="bold">TYPE</text>
+  <text x="298" y="420" fill="#8b949e" font-size="10" font-weight="bold">VALUE</text>
+  <text x="510" y="420" fill="#8b949e" font-size="10" font-weight="bold">STATUS</text>
+  <!-- IOC rows -->
+  <rect x="215" y="428" width="420" height="22" fill="#161b22"/>
+  <text x="228" y="443" fill="#f0883e" font-size="10">IP</text>
+  <text x="298" y="443" fill="#e6edf3" font-size="10" font-family="monospace">185.220.101.47</text>
+  <rect x="500" y="431" width="65" height="14" rx="3" fill="#da363350"/>
+  <text x="532" y="442" fill="#da3633" font-size="9" text-anchor="middle">MALICIOUS</text>
+
+  <rect x="215" y="450" width="420" height="22" fill="#0d1117"/>
+  <text x="228" y="465" fill="#f0883e" font-size="10">IP</text>
+  <text x="298" y="465" fill="#e6edf3" font-size="10" font-family="monospace">10.0.0.99  (C2)</text>
+  <rect x="500" y="453" width="65" height="14" rx="3" fill="#da363350"/>
+  <text x="532" y="464" fill="#da3633" font-size="9" text-anchor="middle">MALICIOUS</text>
+
+  <rect x="215" y="472" width="420" height="22" fill="#161b22"/>
+  <text x="228" y="487" fill="#d2a8ff" font-size="10">URL</text>
+  <text x="298" y="487" fill="#e6edf3" font-size="10" font-family="monospace">http://evil.io/sh.ps1</text>
+  <rect x="500" y="475" width="65" height="14" rx="3" fill="#da363350"/>
+  <text x="532" y="486" fill="#da3633" font-size="9" text-anchor="middle">MALICIOUS</text>
+
+  <rect x="215" y="494" width="420" height="22" fill="#0d1117"/>
+  <text x="228" y="509" fill="#58a6ff" font-size="10">HASH</text>
+  <text x="298" y="509" fill="#e6edf3" font-size="10" font-family="monospace">a3f8b2d1...e9c4  (ps.exe)</text>
+  <rect x="500" y="497" width="65" height="14" rx="3" fill="#f0883e50"/>
+  <text x="532" y="508" fill="#f0883e" font-size="9" text-anchor="middle">SUSPICIOUS</text>
+
+  <rect x="215" y="516" width="420" height="22" fill="#161b22"/>
+  <text x="228" y="531" fill="#3fb950" font-size="10">HOST</text>
+  <text x="298" y="531" fill="#e6edf3" font-size="10" font-family="monospace">WORKSTATION-047</text>
+  <rect x="500" y="519" width="65" height="14" rx="3" fill="#1a4721"/>
+  <text x="532" y="530" fill="#3fb950" font-size="9" text-anchor="middle">CONTAINED</text>
+
+  <!-- RIGHT column: Timeline + Actions -->
+  <rect x="650" y="160" width="435" height="220" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <rect x="650" y="160" width="435" height="32" rx="6" fill="#21262d"/>
+  <text x="670" y="181" fill="#ffffff" font-size="13" font-weight="bold">⏱  Investigation Timeline</text>
+
+  <!-- Timeline entries -->
+  <circle cx="674" cy="215" r="6" fill="#da3633"/>
+  <line x1="674" y1="221" x2="674" y2="244" stroke="#30363d" stroke-width="1"/>
+  <text x="686" y="215" fill="#8b949e" font-size="10">14:28:38</text>
+  <text x="748" y="215" fill="#e6edf3" font-size="11">Case auto-created by StackStorm</text>
+
+  <circle cx="674" cy="248" r="6" fill="#3fb950"/>
+  <line x1="674" y1="254" x2="674" y2="277" stroke="#30363d" stroke-width="1"/>
+  <text x="686" y="248" fill="#8b949e" font-size="10">14:28:40</text>
+  <text x="748" y="248" fill="#e6edf3" font-size="11">IP blocked via iptables DROP</text>
+
+  <circle cx="674" cy="281" r="6" fill="#3fb950"/>
+  <line x1="674" y1="287" x2="674" y2="310" stroke="#30363d" stroke-width="1"/>
+  <text x="686" y="281" fill="#8b949e" font-size="10">14:30:12</text>
+  <text x="748" y="281" fill="#e6edf3" font-size="11">Velociraptor hunt launched on WS-047</text>
+
+  <circle cx="674" cy="314" r="6" fill="#f0883e"/>
+  <line x1="674" y1="320" x2="674" y2="343" stroke="#30363d" stroke-width="1"/>
+  <text x="686" y="314" fill="#8b949e" font-size="10">14:32:05</text>
+  <text x="748" y="314" fill="#e6edf3" font-size="11">IOCs pushed to MISP</text>
+
+  <circle cx="674" cy="347" r="6" fill="#58a6ff"/>
+  <text x="686" y="347" fill="#8b949e" font-size="10">14:35:22</text>
+  <text x="748" y="347" fill="#e6edf3" font-size="11">Analyst review — ACTIVE</text>
+
+  <!-- Actions -->
+  <rect x="650" y="392" width="435" height="156" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <rect x="650" y="392" width="435" height="32" rx="6" fill="#21262d"/>
+  <text x="670" y="413" fill="#ffffff" font-size="13" font-weight="bold">⚡  Response Actions</text>
+  <!-- Action buttons grid -->
+  <rect x="665" y="433" width="180" height="32" rx="4" fill="#0d1f12" stroke="#3fb950" stroke-width="1"/>
+  <text x="755" y="453" fill="#3fb950" font-size="12" text-anchor="middle">🔒  Host Isolated</text>
+  <rect x="860" y="433" width="180" height="32" rx="4" fill="#21262d" stroke="#30363d" stroke-width="1"/>
+  <text x="950" y="453" fill="#8b949e" font-size="12" text-anchor="middle">🔍  Memory Dump</text>
+  <rect x="665" y="474" width="180" height="32" rx="4" fill="#0d1f12" stroke="#3fb950" stroke-width="1"/>
+  <text x="755" y="494" fill="#3fb950" font-size="12" text-anchor="middle">⛔  IP Blocked</text>
+  <rect x="860" y="474" width="180" height="32" rx="4" fill="#0b1f3a" stroke="#388bfd" stroke-width="1"/>
+  <text x="950" y="494" fill="#58a6ff" font-size="12" text-anchor="middle">📧  Notify Manager</text>
+  <rect x="665" y="515" width="375" height="24" rx="4" fill="#1a1400" stroke="#f0883e" stroke-width="1"/>
+  <text x="852" y="531" fill="#f0883e" font-size="11" text-anchor="middle">⚠  Velociraptor Hunt Running — artifacts collecting…</text>
+
+  <!-- Bottom: MITRE coverage -->
+  <rect x="215" y="556" width="870" height="110" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <rect x="215" y="556" width="870" height="32" rx="6" fill="#21262d"/>
+  <text x="235" y="577" fill="#ffffff" font-size="13" font-weight="bold">🎯  MITRE ATT&amp;CK Techniques Observed</text>
+
+  <rect x="235" y="597" width="150" height="26" rx="4" fill="#da363340" stroke="#da3633" stroke-width="1"/>
+  <text x="310" y="614" fill="#ffa198" font-size="11" text-anchor="middle">T1566.002  Phishing</text>
+
+  <rect x="400" y="597" width="150" height="26" rx="4" fill="#da363340" stroke="#da3633" stroke-width="1"/>
+  <text x="475" y="614" fill="#ffa198" font-size="11" text-anchor="middle">T1059.001  PowerShell</text>
+
+  <rect x="565" y="597" width="150" height="26" rx="4" fill="#f0883e40" stroke="#f0883e" stroke-width="1"/>
+  <text x="640" y="614" fill="#f0883e" font-size="11" text-anchor="middle">T1078  Valid Accounts</text>
+
+  <rect x="730" y="597" width="150" height="26" rx="4" fill="#d2a8ff40" stroke="#d2a8ff" stroke-width="1"/>
+  <text x="805" y="614" fill="#d2a8ff" font-size="11" text-anchor="middle">T1110  Brute Force</text>
+
+  <rect x="895" y="597" width="170" height="26" rx="4" fill="#388bfd40" stroke="#388bfd" stroke-width="1"/>
+  <text x="980" y="614" fill="#58a6ff" font-size="11" text-anchor="middle">T1071  C2 via HTTP</text>
+
+  <rect x="235" y="630" width="140" height="26" rx="4" fill="#3fb95040" stroke="#3fb950" stroke-width="1"/>
+  <text x="305" y="647" fill="#3fb950" font-size="11" text-anchor="middle">T1053  Sched Task</text>
+
+  <rect x="390" y="630" width="160" height="26" rx="4" fill="#6e768140" stroke="#6e7681" stroke-width="1"/>
+  <text x="470" y="647" fill="#8b949e" font-size="11" text-anchor="middle">T1490  Inhibit Recovery</text>
+</svg>

@@ -1,0 +1,153 @@
+# =============================================================================
+# vector.toml — Log Ingestion Pipeline
+# Vector collects, parses, and ships logs to OpenSearch
+# =============================================================================
+
+# ── Sources ──────────────────────────────────────────────────────────────────
+
+[sources.sysmon]
+type = "file"
+include = ["/var/log/sysmon.log"]
+read_from = "beginning"
+
+[sources.auth_logs]
+type = "file"
+include = ["/var/log/auth.log", "/var/log/secure"]
+read_from = "beginning"
+
+[sources.windows_events]
+type = "file"
+include = ["/var/log/winlogbeat/*.json"]
+read_from = "beginning"
+
+[sources.zeek_conn]
+type = "file"
+include = ["/opt/zeek/logs/current/conn.log"]
+read_from = "beginning"
+
+[sources.nginx_access]
+type = "file"
+include = ["/var/log/nginx/access.log"]
+read_from = "beginning"
+
+# ── Transforms ───────────────────────────────────────────────────────────────
+
+[transforms.parse_sysmon]
+type = "remap"
+inputs = ["sysmon"]
+source = '''
+. = parse_json!(.message)
+.source = "sysmon"
+.ingest_timestamp = now()
+'''
+
+[transforms.parse_auth]
+type = "remap"
+inputs = ["auth_logs"]
+source = '''
+.source = "auth"
+.ingest_timestamp = now()
+# detect failed logins
+if match(string!(.message), r'Failed password') {
+  .event.type = "failed_login"
+  .event.severity = "medium"
+  user_match = parse_regex(.message, r'for (?:invalid user )?(?P<user>\S+) from (?P<src_ip>\S+)') ?? {}
+  .user.name = get!(user_match, ["user"])
+  .source.ip = get!(user_match, ["src_ip"])
+}
+# detect successful sudo
+if match(string!(.message), r'sudo:') {
+  .event.type = "privilege_use"
+  .event.severity = "low"
+}
+'''
+
+[transforms.parse_windows]
+type = "remap"
+inputs = ["windows_events"]
+source = '''
+. = parse_json!(.message)
+.source = "windows"
+.ingest_timestamp = now()
+# PowerShell detection
+if exists(.winlog.event_id) && .winlog.event_id == 4104 {
+  .event.type = "powershell_execution"
+  if match(string!(.powershell.script_block_text ?? ""), r'-[Ee]nc') {
+    .event.severity = "critical"
+    .alert.rule = "Suspicious PowerShell - Encoded Command"
+    .mitre.technique = "T1059.001"
+  }
+}
+# Brute force (4625 = failed logon)
+if exists(.winlog.event_id) && .winlog.event_id == 4625 {
+  .event.type = "failed_login"
+  .event.severity = "medium"
+}
+# New process (4688)
+if exists(.winlog.event_id) && .winlog.event_id == 4688 {
+  .event.type = "process_creation"
+}
+'''
+
+[transforms.enrich_geoip]
+type = "remap"
+inputs = ["parse_auth", "parse_windows"]
+source = '''
+if exists(.source.ip) {
+  geo = get_env_var("GEOIP_ENABLED") ?? "false"
+  if geo == "true" {
+    .source.geo = get_enrichment_table_record("geoip", {"ip": .source.ip}) ?? {}
+  }
+}
+'''
+
+[transforms.add_metadata]
+type = "remap"
+inputs = ["parse_sysmon", "enrich_geoip", "parse_windows"]
+source = '''
+.lab.version = "1.0"
+.lab.environment = "soc-lab"
+if !exists(.event.severity) {
+  .event.severity = "info"
+}
+'''
+
+# ── Sinks ────────────────────────────────────────────────────────────────────
+
+[sinks.opensearch]
+type = "elasticsearch"
+inputs = ["add_metadata"]
+endpoints = ["http://opensearch:9200"]
+index = "logs-%Y-%m-%d"
+compression = "gzip"
+bulk.action = "index"
+
+  [sinks.opensearch.auth]
+  strategy = "basic"
+  user = "admin"
+  password = "${OPENSEARCH_PASSWORD}"
+
+  [sinks.opensearch.tls]
+  verify_certificate = false
+
+[sinks.console_debug]
+type = "console"
+inputs = ["add_metadata"]
+encoding.codec = "json"
+target = "stdout"
+
+# Route critical events to dedicated index
+[sinks.opensearch_critical]
+type = "elasticsearch"
+inputs = ["add_metadata"]
+endpoints = ["http://opensearch:9200"]
+index = "alerts-critical-%Y-%m-%d"
+compression = "gzip"
+
+  [sinks.opensearch_critical.auth]
+  strategy = "basic"
+  user = "admin"
+  password = "${OPENSEARCH_PASSWORD}"
+
+  [sinks.opensearch_critical.request]
+  headers.X-SOC-Priority = "critical"

@@ -1,0 +1,98 @@
+---
+name: auto_block_brute_force
+pack: soc_lab
+description: Auto-respond to brute force alerts from ElastAlert2.
+enabled: true
+
+trigger:
+  type: core.st2.webhook
+  parameters:
+    url: elastalert
+
+criteria:
+  trigger.body.alert_name:
+    pattern: Brute Force Attack Detected
+    type: equals
+
+action:
+  ref: soc_lab.respond_brute_force
+  parameters:
+    src_ip: "{{ trigger.body.source_ip }}"
+    alert_id: "{{ trigger.body.alert_id }}"
+    count: "{{ trigger.body.count }}"
+    severity: "{{ trigger.body.severity }}"
+
+---
+name: investigate_powershell
+pack: soc_lab
+description: Create an investigation case for suspicious PowerShell execution.
+enabled: true
+
+trigger:
+  type: core.st2.webhook
+  parameters:
+    url: elastalert
+
+criteria:
+  trigger.body.alert_name:
+    pattern: Suspicious PowerShell Execution
+    type: equals
+
+action:
+  ref: soc_lab.investigate_powershell
+  parameters:
+    host: "{{ trigger.body.host_name }}"
+    user: "{{ trigger.body.user_name }}"
+    script: "{{ trigger.body.script_block }}"
+    command_line: "{{ trigger.body.command_line }}"
+    severity: "{{ trigger.body.severity }}"
+
+---
+name: respond_lateral_movement
+pack: soc_lab
+description: Create an isolation workflow for lateral movement alerts.
+enabled: true
+
+trigger:
+  type: core.st2.webhook
+  parameters:
+    url: elastalert
+
+criteria:
+  trigger.body.alert_name:
+    pattern: Lateral Movement Detected
+    type: equals
+
+action:
+  ref: soc_lab.isolate_host
+  parameters:
+    src_ip: "{{ trigger.body.source_ip }}"
+    destination_ip: "{{ trigger.body.destination_ip }}"
+    destination_port: "{{ trigger.body.destination_port }}"
+    alert_name: "{{ trigger.body.alert_name }}"
+    severity: "{{ trigger.body.severity }}"
+
+---
+name: create_privilege_escalation_case
+pack: soc_lab
+description: Open an incident case for privilege escalation alerts.
+enabled: true
+
+trigger:
+  type: core.st2.webhook
+  parameters:
+    url: elastalert
+
+criteria:
+  trigger.body.alert_name:
+    pattern: Privilege Escalation Attempt
+    type: equals
+
+action:
+  ref: soc_lab.create_iris_case
+  parameters:
+    alert_name: "{{ trigger.body.alert_name }}"
+    host: "{{ trigger.body.host_name }}"
+    user: "{{ trigger.body.user_name }}"
+    severity: "{{ trigger.body.severity }}"
+    description: "{{ trigger.body.command_line }}"

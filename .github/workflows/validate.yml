@@ -1,0 +1,188 @@
+name: Autonomous SOC Lab — Validation CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ── 1. Shell Script Linting ───────────────────────────────────────────────
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install ShellCheck
+        run: sudo apt-get install -y shellcheck
+
+      - name: Lint all shell scripts
+        run: |
+          SCRIPTS=$(find . -name "*.sh" -not -path "./.git/*")
+          if [ -z "$SCRIPTS" ]; then
+            echo "No shell scripts found — skipping"
+            exit 0
+          fi
+          echo "$SCRIPTS" | while read -r f; do
+            echo "Checking: $f"
+            shellcheck --exclude=SC2034,SC1091,SC2154,SC2086 --severity=error "$f"
+          done
+
+  # ── 2. Python Quality (flake8 + bandit) ───────────────────────────────────
+  python-quality:
+    name: Python Quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install linters
+        run: pip install flake8 bandit
+
+      - name: flake8 (style)
+        run: |
+          mapfile -t PY_FILES < <(find . -name "*.py" -not -path "./.git/*")
+          if [ ${#PY_FILES[@]} -eq 0 ]; then
+            echo "No Python files found — skipping flake8"
+            exit 0
+          fi
+          flake8 --max-line-length=120 --ignore=E402,W503 "${PY_FILES[@]}"
+
+      - name: bandit (security)
+        run: |
+          mapfile -t PY_FILES < <(find . -name "*.py" -not -path "./.git/*")
+          if [ ${#PY_FILES[@]} -eq 0 ]; then
+            echo "No Python files found — skipping bandit"
+            exit 0
+          fi
+          bandit -r -ll --skip B101,B106,B324 "${PY_FILES[@]}"
+
+  # ── 3. YAML Validation ────────────────────────────────────────────────────
+  yaml-lint:
+    name: YAML Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install yamllint
+        run: pip install yamllint
+
+      - name: Lint YAML files
+        run: |
+          yamllint \
+            -d "{extends: relaxed, rules: {line-length: {max: 160}}}" \
+            detections/ soar/ configs/ caldera/
+
+  # ── 4. Docker Compose Validation ─────────────────────────────────────────
+  docker-compose-validate:
+    name: Docker Compose Validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create stub .env for validation
+        run: cp .env.example .env
+
+      - name: Validate docker-compose.yml
+        run: docker compose config --quiet
+
+  # ── 5. Repo Structure Check ───────────────────────────────────────────────
+  structure-check:
+    name: Structure Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify required files exist
+        run: |
+          REQUIRED=(
+            "README.md"
+            "docker-compose.yml"
+            ".env.example"
+            ".gitignore"
+            "pipeline/vector.toml"
+            "detections/brute_force.yaml"
+            "detections/powershell.yaml"
+            "detections/privilege_escalation.yaml"
+            "detections/lateral_movement.yaml"
+            "soar/pack.yaml"
+            "soar/rules/elastalert.yaml"
+            "soar/actions/respond_brute_force.yaml"
+            "soar/actions/investigate_powershell.yaml"
+            "soar/actions/isolate_host.yaml"
+            "soar/actions/create_iris_case.yaml"
+            "soar/actions/workflows/auto_respond.yaml"
+            "soar/actions/workflows/investigate_powershell.yaml"
+            "soar/actions/workflows/isolate_host.yaml"
+            "soar/actions/workflows/create_iris_case.yaml"
+            "configs/opensearch/opensearch.yml"
+            "configs/opensearch/dashboards.yml"
+            "configs/elastalert/config.yaml"
+            "caldera/red_team.yml"
+            "scripts/health-check.sh"
+            "LICENSE"
+            ".github/workflows/validate.yml"
+          )
+          FAIL=0
+          for f in "${REQUIRED[@]}"; do
+            if [ -f "$f" ]; then
+              echo "✅  $f"
+            else
+              echo "❌  MISSING: $f"
+              FAIL=1
+            fi
+          done
+          exit $FAIL
+
+  # ── 6. Secret Scan ────────────────────────────────────────────────────────
+  secret-scan:
+    name: Secret Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Scan for hardcoded secrets
+        run: |
+          FAIL=0
+
+          # AWS key pattern
+          MATCHES=$(grep -rEn \
+            --exclude-dir=".git" \
+            "AKIA[0-9A-Z]{16}" . 2>/dev/null || true)
+          if [ -n "$MATCHES" ]; then
+            echo "⚠️  AWS key found:"
+            echo "$MATCHES"
+            FAIL=1
+          fi
+
+          # Private key headers
+          MATCHES=$(grep -rEn \
+            --exclude-dir=".git" \
+            "-----BEGIN (RSA|EC|DSA) PRIVATE KEY-----" . 2>/dev/null || true)
+          if [ -n "$MATCHES" ]; then
+            echo "⚠️  Private key found:"
+            echo "$MATCHES"
+            FAIL=1
+          fi
+
+          # Hardcoded passwords — skip lines using env var substitution (${ or $()
+          MATCHES=$(grep -rEn \
+            --include="*.py" --include="*.sh" \
+            --include="*.yml" --include="*.yaml" --include="*.toml" \
+            --exclude-dir=".git" \
+            --exclude=".env.example" \
+            'password\s*=\s*"[^$"][^"]{4,}"' . 2>/dev/null \
+            | grep -v 'change_me' \
+            | grep -v '\$[{(]' \
+            || true)
+          if [ -n "$MATCHES" ]; then
+            echo "⚠️  Potential hardcoded password:"
+            echo "$MATCHES"
+            FAIL=1
+          fi
+
+          exit $FAIL

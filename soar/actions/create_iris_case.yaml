@@ -1,0 +1,23 @@
+---
+name: create_iris_case
+pack: soc_lab
+description: Create an IRIS case for alerts that do not need an automated block action.
+runner_type: orquesta
+entry_point: workflows/create_iris_case.yaml
+enabled: true
+parameters:
+  alert_name:
+    type: string
+    required: true
+  host:
+    type: string
+    default: unknown
+  user:
+    type: string
+    default: unknown
+  severity:
+    type: string
+    default: medium
+  description:
+    type: string
+    default: ""

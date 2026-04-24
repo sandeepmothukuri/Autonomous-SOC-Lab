@@ -1,0 +1,47 @@
+---
+version: 1.0
+description: Create an IRIS case for suspicious PowerShell activity.
+
+input:
+  - host
+  - user
+  - script
+  - command_line
+  - severity
+
+vars:
+  - iris_case_id: ""
+
+tasks:
+  create_case:
+    action: core.http
+    input:
+      url: "http://iris:8000/manage/cases/add"
+      method: POST
+      headers:
+        Authorization: "Bearer {{ st2kv.system.iris_token }}"
+        Content-Type: application/json
+      body:
+        case_soc_id: "AUTO-POWERSHELL-{{ ctx().host }}"
+        case_customer: 1
+        case_name: "AUTO-IR: Suspicious PowerShell - {{ ctx().host }}"
+        case_description: |
+          Suspicious PowerShell execution detected by ElastAlert2.
+
+          Host: {{ ctx().host }}
+          User: {{ ctx().user }}
+          Severity: {{ ctx().severity }}
+          Command Line: {{ ctx().command_line }}
+          Script Block: {{ ctx().script }}
+        case_severity_id: 4
+        case_template_id: 1
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - iris_case_id: "{{ result().body.data.case_id }}"
+        do: notify_team
+
+  notify_team:
+    action: core.echo
+    input:
+      message: "PowerShell investigation case created for {{ ctx().host }}. IRIS case: {{ ctx().iris_case_id }}"

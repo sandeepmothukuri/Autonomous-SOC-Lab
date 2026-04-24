@@ -1,0 +1,47 @@
+---
+version: 1.0
+description: Create a generic IRIS incident case from an ElastAlert2 alert.
+
+input:
+  - alert_name
+  - host
+  - user
+  - severity
+  - description
+
+vars:
+  - iris_case_id: ""
+
+tasks:
+  create_case:
+    action: core.http
+    input:
+      url: "http://iris:8000/manage/cases/add"
+      method: POST
+      headers:
+        Authorization: "Bearer {{ st2kv.system.iris_token }}"
+        Content-Type: application/json
+      body:
+        case_soc_id: "AUTO-GENERIC-{{ ctx().host }}"
+        case_customer: 1
+        case_name: "AUTO-IR: {{ ctx().alert_name }} - {{ ctx().host }}"
+        case_description: |
+          Alert: {{ ctx().alert_name }}
+          Host: {{ ctx().host }}
+          User: {{ ctx().user }}
+          Severity: {{ ctx().severity }}
+
+          Details:
+          {{ ctx().description }}
+        case_severity_id: 3
+        case_template_id: 1
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - iris_case_id: "{{ result().body.data.case_id }}"
+        do: notify_team
+
+  notify_team:
+    action: core.echo
+    input:
+      message: "{{ ctx().alert_name }} case created for {{ ctx().host }}. IRIS case: {{ ctx().iris_case_id }}"

@@ -1,0 +1,23 @@
+---
+name: isolate_host
+pack: soc_lab
+description: Launch a Velociraptor isolation flow and create an IRIS case.
+runner_type: orquesta
+entry_point: workflows/isolate_host.yaml
+enabled: true
+parameters:
+  src_ip:
+    type: string
+    required: true
+  destination_ip:
+    type: string
+    default: unknown
+  destination_port:
+    type: string
+    default: unknown
+  alert_name:
+    type: string
+    default: Lateral Movement Detected
+  severity:
+    type: string
+    default: high

@@ -1,0 +1,248 @@
+<svg viewBox="0 0 1100 700" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI',Arial,sans-serif">
+  <rect width="1100" height="700" fill="#0a0507"/>
+  <!-- Header -->
+  <rect width="1100" height="48" fill="#14080d"/>
+  <rect x="0" y="48" width="1100" height="1" fill="#4d1f2d"/>
+  <text x="20" y="30" fill="#ff4d4d" font-size="15" font-weight="bold">🎯 MITRE Caldera — Red Team Operations</text>
+  <text x="700" y="30" fill="#8b4d5a" font-size="12">Caldera v5.0  |  Operation: APT29-Simulation  |  Adversary: Cozy Bear</text>
+  <rect x="1010" y="12" width="72" height="24" rx="4" fill="#4d0a0a"/>
+  <text x="1046" y="28" fill="#ff4d4d" font-size="11" text-anchor="middle" font-weight="bold">● RUNNING</text>
+
+  <!-- KPI Strip -->
+  <rect x="10" y="58" width="165" height="64" rx="5" fill="#14080d" stroke="#4d1f2d" stroke-width="1"/>
+  <text x="30" y="82" fill="#8b4d5a" font-size="10" font-weight="bold">AGENTS ACTIVE</text>
+  <text x="30" y="108" fill="#ff4d4d" font-size="30" font-weight="bold">4</text>
+
+  <rect x="184" y="58" width="165" height="64" rx="5" fill="#14080d" stroke="#4d1f2d" stroke-width="1"/>
+  <text x="204" y="82" fill="#8b4d5a" font-size="10" font-weight="bold">ABILITIES EXECUTED</text>
+  <text x="204" y="108" fill="#ff7b7b" font-size="30" font-weight="bold">17</text>
+
+  <rect x="358" y="58" width="165" height="64" rx="5" fill="#14080d" stroke="#4d1f2d" stroke-width="1"/>
+  <text x="378" y="82" fill="#8b4d5a" font-size="10" font-weight="bold">HOSTS PWNED</text>
+  <text x="378" y="108" fill="#ff4d4d" font-size="30" font-weight="bold">3</text>
+
+  <rect x="532" y="58" width="165" height="64" rx="5" fill="#14080d" stroke="#4d1f2d" stroke-width="1"/>
+  <text x="552" y="82" fill="#8b4d5a" font-size="10" font-weight="bold">DETECTIONS FIRED</text>
+  <text x="552" y="108" fill="#3fb950" font-size="30" font-weight="bold">12</text>
+
+  <rect x="706" y="58" width="165" height="64" rx="5" fill="#14080d" stroke="#4d1f2d" stroke-width="1"/>
+  <text x="726" y="82" fill="#8b4d5a" font-size="10" font-weight="bold">MITRE COVERAGE</text>
+  <text x="726" y="108" fill="#ff7b7b" font-size="30" font-weight="bold">68<tspan font-size="16">%</tspan></text>
+
+  <rect x="880" y="58" width="210" height="64" rx="5" fill="#14080d" stroke="#4d1f2d" stroke-width="1"/>
+  <text x="900" y="82" fill="#8b4d5a" font-size="10" font-weight="bold">OPERATION DURATION</text>
+  <text x="900" y="108" fill="#ff7b7b" font-size="30" font-weight="bold">00:47:32</text>
+
+  <!-- Attack Chain -->
+  <rect x="10" y="133" width="690" height="330" rx="6" fill="#14080d" stroke="#4d1f2d" stroke-width="1"/>
+  <rect x="10" y="133" width="690" height="32" rx="6" fill="#1f0a12"/>
+  <text x="30" y="154" fill="#ff4d4d" font-size="13" font-weight="bold">💀  Kill Chain — APT29 Cozy Bear</text>
+  <text x="500" y="154" fill="#8b4d5a" font-size="11">Status: Phase 4 / 7  ▓▓▓▓░░░</text>
+
+  <!-- Phase boxes horizontal chain -->
+  <!-- Phase 1: Recon -->
+  <rect x="25" y="178" width="88" height="64" rx="5" fill="#0d2b0d" stroke="#3fb950" stroke-width="1.5"/>
+  <text x="69" y="196" fill="#3fb950" font-size="9" text-anchor="middle" font-weight="bold">PHASE 1</text>
+  <text x="69" y="210" fill="#3fb950" font-size="11" text-anchor="middle" font-weight="bold">Recon</text>
+  <text x="69" y="224" fill="#3fb950" font-size="9" text-anchor="middle">T1595</text>
+  <text x="69" y="237" fill="#3fb950" font-size="8" text-anchor="middle">✓ DONE</text>
+  <line x1="113" y1="210" x2="130" y2="210" stroke="#3fb950" stroke-width="1.5"/>
+  <polygon points="127,206 133,210 127,214" fill="#3fb950"/>
+
+  <!-- Phase 2: Initial Access -->
+  <rect x="133" y="178" width="88" height="64" rx="5" fill="#0d2b0d" stroke="#3fb950" stroke-width="1.5"/>
+  <text x="177" y="196" fill="#3fb950" font-size="9" text-anchor="middle" font-weight="bold">PHASE 2</text>
+  <text x="177" y="210" fill="#3fb950" font-size="11" text-anchor="middle" font-weight="bold">Init Access</text>
+  <text x="177" y="224" fill="#3fb950" font-size="9" text-anchor="middle">T1566.002</text>
+  <text x="177" y="237" fill="#3fb950" font-size="8" text-anchor="middle">✓ DONE</text>
+  <line x1="221" y1="210" x2="238" y2="210" stroke="#3fb950" stroke-width="1.5"/>
+  <polygon points="235,206 241,210 235,214" fill="#3fb950"/>
+
+  <!-- Phase 3: Execution -->
+  <rect x="241" y="178" width="88" height="64" rx="5" fill="#0d2b0d" stroke="#3fb950" stroke-width="1.5"/>
+  <text x="285" y="196" fill="#3fb950" font-size="9" text-anchor="middle" font-weight="bold">PHASE 3</text>
+  <text x="285" y="210" fill="#3fb950" font-size="11" text-anchor="middle" font-weight="bold">Execution</text>
+  <text x="285" y="224" fill="#3fb950" font-size="9" text-anchor="middle">T1059.001</text>
+  <text x="285" y="237" fill="#3fb950" font-size="8" text-anchor="middle">✓ DONE</text>
+  <line x1="329" y1="210" x2="346" y2="210" stroke="#3fb950" stroke-width="1.5"/>
+  <polygon points="343,206 349,210 343,214" fill="#3fb950"/>
+
+  <!-- Phase 4: Persistence (ACTIVE) -->
+  <rect x="349" y="172" width="94" height="76" rx="5" fill="#3d0d00" stroke="#ff4d4d" stroke-width="2"/>
+  <rect x="349" y="172" width="94" height="8" rx="4" fill="#ff4d4d" opacity="0.6"/>
+  <text x="396" y="196" fill="#ff4d4d" font-size="9" text-anchor="middle" font-weight="bold">PHASE 4</text>
+  <text x="396" y="212" fill="#ff7b7b" font-size="11" text-anchor="middle" font-weight="bold">Persistence</text>
+  <text x="396" y="226" fill="#ff4d4d" font-size="9" text-anchor="middle">T1053.005</text>
+  <text x="396" y="240" fill="#ff4d4d" font-size="9" text-anchor="middle">● ACTIVE</text>
+  <line x1="443" y1="210" x2="460" y2="210" stroke="#4d1f2d" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <polygon points="457,206 463,210 457,214" fill="#4d1f2d"/>
+
+  <!-- Phase 5: Priv Esc (pending) -->
+  <rect x="463" y="178" width="88" height="64" rx="5" fill="#1a0d14" stroke="#4d1f2d" stroke-width="1"/>
+  <text x="507" y="196" fill="#4d1f2d" font-size="9" text-anchor="middle" font-weight="bold">PHASE 5</text>
+  <text x="507" y="210" fill="#6e3d4d" font-size="11" text-anchor="middle" font-weight="bold">Priv Esc</text>
+  <text x="507" y="224" fill="#4d1f2d" font-size="9" text-anchor="middle">T1548</text>
+  <text x="507" y="237" fill="#4d1f2d" font-size="8" text-anchor="middle">PENDING</text>
+  <line x1="551" y1="210" x2="568" y2="210" stroke="#4d1f2d" stroke-width="1" stroke-dasharray="4,3"/>
+
+  <!-- Phase 6 -->
+  <rect x="571" y="178" width="88" height="64" rx="5" fill="#1a0d14" stroke="#4d1f2d" stroke-width="1"/>
+  <text x="615" y="196" fill="#4d1f2d" font-size="9" text-anchor="middle" font-weight="bold">PHASE 6</text>
+  <text x="615" y="210" fill="#6e3d4d" font-size="11" text-anchor="middle" font-weight="bold">Lateral Mv</text>
+  <text x="615" y="224" fill="#4d1f2d" font-size="9" text-anchor="middle">T1021</text>
+  <text x="615" y="237" fill="#4d1f2d" font-size="8" text-anchor="middle">PENDING</text>
+
+  <!-- Ability Log -->
+  <text x="30" y="272" fill="#ff4d4d" font-size="12" font-weight="bold">Recent Abilities Executed:</text>
+  <rect x="20" y="280" width="670" height="22" fill="#1a0d14"/>
+  <rect x="20" y="280" width="8" height="22" fill="#3fb950"/>
+  <text x="36" y="295" fill="#8b4d5a" font-size="10">14:28:01</text>
+  <text x="108" y="295" fill="#3fb950" font-size="10" font-weight="bold">[SUCCESS]</text>
+  <text x="180" y="295" fill="#e6d0d7" font-size="10">nmap-discovery — scanned 172.20.0.0/24 — found 9 live hosts</text>
+
+  <rect x="20" y="302" width="670" height="22" fill="#14080d"/>
+  <rect x="20" y="302" width="8" height="22" fill="#3fb950"/>
+  <text x="36" y="317" fill="#8b4d5a" font-size="10">14:28:33</text>
+  <text x="108" y="317" fill="#3fb950" font-size="10" font-weight="bold">[SUCCESS]</text>
+  <text x="180" y="317" fill="#e6d0d7" font-size="10">spearphish-docm — delivered lure to WORKSTATION-047</text>
+
+  <rect x="20" y="324" width="670" height="22" fill="#1a0d14"/>
+  <rect x="20" y="324" width="8" height="22" fill="#3fb950"/>
+  <text x="36" y="339" fill="#8b4d5a" font-size="10">14:28:40</text>
+  <text x="108" y="339" fill="#3fb950" font-size="10" font-weight="bold">[SUCCESS]</text>
+  <text x="180" y="339" fill="#e6d0d7" font-size="10">ps-encoded-exec — ran reverse shell via encoded PowerShell</text>
+
+  <rect x="20" y="346" width="670" height="22" fill="#14080d"/>
+  <rect x="20" y="346" width="8" height="22" fill="#3fb950"/>
+  <text x="36" y="361" fill="#8b4d5a" font-size="10">14:31:05</text>
+  <text x="108" y="361" fill="#3fb950" font-size="10" font-weight="bold">[SUCCESS]</text>
+  <text x="180" y="361" fill="#e6d0d7" font-size="10">credential-dump-lsass — extracted NTLM hashes from LSASS</text>
+
+  <rect x="20" y="368" width="670" height="22" fill="#1a0d14"/>
+  <rect x="20" y="368" width="8" height="22" fill="#ff4d4d"/>
+  <text x="36" y="383" fill="#8b4d5a" font-size="10">14:32:11</text>
+  <text x="108" y="383" fill="#ff4d4d" font-size="10" font-weight="bold">[BLOCKED]</text>
+  <text x="180" y="383" fill="#e6d0d7" font-size="10">schtask-persist — DETECTED by ElastAlert2, host isolated by SOAR ✓</text>
+
+  <rect x="20" y="390" width="670" height="22" fill="#14080d"/>
+  <rect x="20" y="390" width="8" height="22" fill="#ff7b7b"/>
+  <text x="36" y="405" fill="#8b4d5a" font-size="10">14:45:00</text>
+  <text x="108" y="405" fill="#ff7b7b" font-size="10" font-weight="bold">[RUNNING]</text>
+  <text x="180" y="405" fill="#e6d0d7" font-size="10">schtask-persist — retrying on backup agent WS-052…</text>
+
+  <!-- Agent status -->
+  <text x="30" y="430" fill="#ff4d4d" font-size="12" font-weight="bold">Agent Beacon Status:</text>
+  <rect x="20" y="436" width="670" height="20" fill="#0d2b0d"/>
+  <rect x="24" y="440" width="8" height="12" rx="2" fill="#3fb950"/>
+  <text x="38" y="451" fill="#3fb950" font-size="10">sandcat-WS047</text>
+  <text x="140" y="451" fill="#8b4d5a" font-size="10">172.20.0.47</text>
+  <text x="240" y="451" fill="#3fb950" font-size="10">sleep:30s</text>
+  <text x="310" y="451" fill="#3fb950" font-size="10">last-seen: 14s ago</text>
+  <text x="440" y="451" fill="#3fb950" font-size="10">PRIV: SYSTEM</text>
+  <text x="545" y="451" fill="#8b4d5a" font-size="10">platform: windows</text>
+
+  <rect x="20" y="456" width="670" height="20" fill="#14080d"/>
+  <rect x="24" y="460" width="8" height="12" rx="2" fill="#3fb950"/>
+  <text x="38" y="471" fill="#3fb950" font-size="10">sandcat-WS052</text>
+  <text x="140" y="471" fill="#8b4d5a" font-size="10">172.20.0.52</text>
+  <text x="240" y="471" fill="#3fb950" font-size="10">sleep:45s</text>
+  <text x="310" y="471" fill="#3fb950" font-size="10">last-seen: 29s ago</text>
+  <text x="440" y="471" fill="#f0883e" font-size="10">PRIV: USER</text>
+  <text x="545" y="471" fill="#8b4d5a" font-size="10">platform: windows</text>
+
+  <!-- MITRE Heatmap (right) -->
+  <rect x="710" y="133" width="380" height="330" rx="6" fill="#14080d" stroke="#4d1f2d" stroke-width="1"/>
+  <rect x="710" y="133" width="380" height="32" rx="6" fill="#1f0a12"/>
+  <text x="730" y="154" fill="#ff4d4d" font-size="13" font-weight="bold">🎯  ATT&amp;CK Technique Coverage</text>
+
+  <!-- Techniques grid -->
+  <text x="730" y="184" fill="#8b4d5a" font-size="10" font-weight="bold">INITIAL ACCESS</text>
+  <rect x="730" y="190" width="80" height="22" rx="3" fill="#3fb95040" stroke="#3fb950" stroke-width="1"/>
+  <text x="770" y="205" fill="#3fb950" font-size="9" text-anchor="middle">T1566.002 ✓</text>
+  <rect x="820" y="190" width="80" height="22" rx="3" fill="#3fb95040" stroke="#3fb950" stroke-width="1"/>
+  <text x="860" y="205" fill="#3fb950" font-size="9" text-anchor="middle">T1190 ✓</text>
+
+  <text x="730" y="228" fill="#8b4d5a" font-size="10" font-weight="bold">EXECUTION</text>
+  <rect x="730" y="234" width="80" height="22" rx="3" fill="#3fb95040" stroke="#3fb950" stroke-width="1"/>
+  <text x="770" y="249" fill="#3fb950" font-size="9" text-anchor="middle">T1059.001 ✓</text>
+  <rect x="820" y="234" width="80" height="22" rx="3" fill="#3fb95040" stroke="#3fb950" stroke-width="1"/>
+  <text x="860" y="249" fill="#3fb950" font-size="9" text-anchor="middle">T1204 ✓</text>
+
+  <text x="730" y="272" fill="#8b4d5a" font-size="10" font-weight="bold">PERSISTENCE</text>
+  <rect x="730" y="278" width="80" height="22" rx="3" fill="#ff4d4d40" stroke="#ff4d4d" stroke-width="1.5"/>
+  <text x="770" y="293" fill="#ff7b7b" font-size="9" text-anchor="middle">T1053 ●</text>
+  <rect x="820" y="278" width="80" height="22" rx="3" fill="#4d1f2d" stroke="#4d1f2d" stroke-width="1"/>
+  <text x="860" y="293" fill="#4d1f2d" font-size="9" text-anchor="middle">T1547 ○</text>
+
+  <text x="730" y="316" fill="#8b4d5a" font-size="10" font-weight="bold">CREDENTIAL ACCESS</text>
+  <rect x="730" y="322" width="80" height="22" rx="3" fill="#3fb95040" stroke="#3fb950" stroke-width="1"/>
+  <text x="770" y="337" fill="#3fb950" font-size="9" text-anchor="middle">T1003.001 ✓</text>
+  <rect x="820" y="322" width="80" height="22" rx="3" fill="#3fb95040" stroke="#3fb950" stroke-width="1"/>
+  <text x="860" y="337" fill="#3fb950" font-size="9" text-anchor="middle">T1110 ✓</text>
+
+  <text x="730" y="360" fill="#8b4d5a" font-size="10" font-weight="bold">LATERAL MOVEMENT</text>
+  <rect x="730" y="366" width="80" height="22" rx="3" fill="#4d1f2d" stroke="#4d1f2d" stroke-width="1"/>
+  <text x="770" y="381" fill="#4d1f2d" font-size="9" text-anchor="middle">T1021.002 ○</text>
+  <rect x="820" y="366" width="80" height="22" rx="3" fill="#4d1f2d" stroke="#4d1f2d" stroke-width="1"/>
+  <text x="860" y="381" fill="#4d1f2d" font-size="9" text-anchor="middle">T1021.006 ○</text>
+
+  <text x="730" y="404" fill="#8b4d5a" font-size="10" font-weight="bold">EXFILTRATION</text>
+  <rect x="730" y="410" width="80" height="22" rx="3" fill="#4d1f2d" stroke="#4d1f2d" stroke-width="1"/>
+  <text x="770" y="425" fill="#4d1f2d" font-size="9" text-anchor="middle">T1048 ○</text>
+
+  <text x="730" y="448" fill="#3fb950" font-size="10">✓ Executed (10)</text>
+  <text x="830" y="448" fill="#ff4d4d" font-size="10">● Active (3)</text>
+  <text x="930" y="448" fill="#4d1f2d" font-size="10">○ Pending (5)</text>
+
+  <!-- Bottom panel: Detection score -->
+  <rect x="10" y="475" width="1080" height="210" rx="6" fill="#14080d" stroke="#4d1f2d" stroke-width="1"/>
+  <rect x="10" y="475" width="1080" height="32" rx="6" fill="#1f0a12"/>
+  <text x="30" y="496" fill="#ff4d4d" font-size="13" font-weight="bold">🛡  Blue Team Detection Score — Real-Time Validation</text>
+
+  <!-- Detection results table -->
+  <rect x="20" y="515" width="1060" height="22" fill="#0d2b0d"/>
+  <text x="30" y="530" fill="#3fb950" font-size="10" font-weight="bold">DETECTION</text>
+  <text x="280" y="530" fill="#3fb950" font-size="10" font-weight="bold">RULE FIRED</text>
+  <text x="520" y="530" fill="#3fb950" font-size="10" font-weight="bold">SOAR RESPONSE</text>
+  <text x="760" y="530" fill="#3fb950" font-size="10" font-weight="bold">RESPONSE TIME</text>
+  <text x="900" y="530" fill="#3fb950" font-size="10" font-weight="bold">VERDICT</text>
+
+  <rect x="20" y="537" width="1060" height="22" fill="#14080d"/>
+  <text x="30" y="552" fill="#e6d0d7" font-size="10">PowerShell -EncodedCommand</text>
+  <text x="280" y="552" fill="#3fb950" font-size="10">powershell.yaml</text>
+  <text x="520" y="552" fill="#3fb950" font-size="10">IRIS Case + Host Isolated</text>
+  <text x="760" y="552" fill="#3fb950" font-size="10">2.1 seconds</text>
+  <rect x="895" y="540" width="80" height="16" rx="3" fill="#0d2b0d" stroke="#3fb950" stroke-width="1"/>
+  <text x="935" y="551" fill="#3fb950" font-size="9" text-anchor="middle">✓ DETECTED</text>
+
+  <rect x="20" y="559" width="1060" height="22" fill="#0d1117"/>
+  <text x="30" y="574" fill="#e6d0d7" font-size="10">SSH Brute Force (100+ attempts)</text>
+  <text x="280" y="574" fill="#3fb950" font-size="10">brute_force.yaml</text>
+  <text x="520" y="574" fill="#3fb950" font-size="10">IP Blocked via iptables</text>
+  <text x="760" y="574" fill="#3fb950" font-size="10">1.8 seconds</text>
+  <rect x="895" y="562" width="80" height="16" rx="3" fill="#0d2b0d" stroke="#3fb950" stroke-width="1"/>
+  <text x="935" y="573" fill="#3fb950" font-size="9" text-anchor="middle">✓ DETECTED</text>
+
+  <rect x="20" y="581" width="1060" height="22" fill="#14080d"/>
+  <text x="30" y="596" fill="#e6d0d7" font-size="10">LSASS Memory Dump (cred access)</text>
+  <text x="280" y="596" fill="#3fb950" font-size="10">privilege_escalation.yaml</text>
+  <text x="520" y="596" fill="#3fb950" font-size="10">Alert + Velociraptor Hunt</text>
+  <text x="760" y="596" fill="#3fb950" font-size="10">3.4 seconds</text>
+  <rect x="895" y="584" width="80" height="16" rx="3" fill="#0d2b0d" stroke="#3fb950" stroke-width="1"/>
+  <text x="935" y="595" fill="#3fb950" font-size="9" text-anchor="middle">✓ DETECTED</text>
+
+  <rect x="20" y="603" width="1060" height="22" fill="#0d1117"/>
+  <text x="30" y="618" fill="#e6d0d7" font-size="10">Scheduled Task Persistence</text>
+  <text x="280" y="618" fill="#ff4d4d" font-size="10">— missed (1st attempt)</text>
+  <text x="520" y="618" fill="#ff4d4d" font-size="10">— no response</text>
+  <text x="760" y="618" fill="#ff4d4d" font-size="10">—</text>
+  <rect x="895" y="606" width="80" height="16" rx="3" fill="#3d0d00" stroke="#ff4d4d" stroke-width="1"/>
+  <text x="935" y="617" fill="#ff4d4d" font-size="9" text-anchor="middle">✗ MISSED</text>
+
+  <!-- Score -->
+  <text x="30" y="658" fill="#8b4d5a" font-size="12">Detection Coverage:</text>
+  <rect x="175" y="644" width="400" height="18" rx="3" fill="#1a0d14"/>
+  <rect x="175" y="644" width="300" height="18" rx="3" fill="#3fb950" opacity="0.7"/>
+  <text x="185" y="657" fill="#fff" font-size="11" font-weight="bold">75% (12/16 techniques detected)  — GOOD</text>
+  <text x="650" y="658" fill="#ff4d4d" font-size="12" font-weight="bold">Gaps: T1053, T1021 — add detection rules!</text>
+</svg>

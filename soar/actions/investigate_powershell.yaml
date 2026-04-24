@@ -1,0 +1,23 @@
+---
+name: investigate_powershell
+pack: soc_lab
+description: Create a PowerShell investigation case from an ElastAlert2 webhook.
+runner_type: orquesta
+entry_point: workflows/investigate_powershell.yaml
+enabled: true
+parameters:
+  host:
+    type: string
+    required: true
+  user:
+    type: string
+    default: unknown
+  script:
+    type: string
+    default: ""
+  command_line:
+    type: string
+    default: ""
+  severity:
+    type: string
+    default: critical

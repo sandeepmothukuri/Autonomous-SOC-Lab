@@ -1,0 +1,70 @@
+---
+version: 1.0
+description: Request host isolation in Velociraptor and create an IRIS case.
+
+input:
+  - src_ip
+  - destination_ip
+  - destination_port
+  - alert_name
+  - severity
+
+vars:
+  - isolation_flow: ""
+  - iris_case_id: ""
+
+tasks:
+  request_isolation:
+    action: core.http
+    input:
+      url: "http://velociraptor:8889/api/v1/flows"
+      method: POST
+      headers:
+        Authorization: "Bearer {{ st2kv.system.velociraptor_token }}"
+        Content-Type: application/json
+      body:
+        flow_request:
+          artifacts:
+            - Windows.Remediation.Quarantine
+          parameters:
+            source_ip: "{{ ctx().src_ip }}"
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - isolation_flow: "{{ result().body.flow_id }}"
+        do: create_case
+      - when: "{{ failed() }}"
+        do: create_case
+
+  create_case:
+    action: core.http
+    input:
+      url: "http://iris:8000/manage/cases/add"
+      method: POST
+      headers:
+        Authorization: "Bearer {{ st2kv.system.iris_token }}"
+        Content-Type: application/json
+      body:
+        case_soc_id: "AUTO-LATERAL-{{ ctx().src_ip }}"
+        case_customer: 1
+        case_name: "AUTO-IR: {{ ctx().alert_name }} - {{ ctx().src_ip }}"
+        case_description: |
+          Lateral movement alert detected by ElastAlert2.
+
+          Source IP: {{ ctx().src_ip }}
+          Destination IP: {{ ctx().destination_ip }}
+          Destination Port: {{ ctx().destination_port }}
+          Severity: {{ ctx().severity }}
+          Velociraptor Isolation Flow: {{ ctx().isolation_flow }}
+        case_severity_id: 3
+        case_template_id: 1
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - iris_case_id: "{{ result().body.data.case_id }}"
+        do: notify_team
+
+  notify_team:
+    action: core.echo
+    input:
+      message: "Lateral movement response complete for {{ ctx().src_ip }}. IRIS case: {{ ctx().iris_case_id }}"

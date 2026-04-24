@@ -1,0 +1,67 @@
+# ============================================================
+# Autonomous SOC Lab — .gitignore
+# ============================================================
+
+# Secrets & credentials — NEVER commit these
+.env
+*.creds
+*.key
+*.pem
+*.p12
+*.pfx
+secrets/
+certs/
+**/passwords.txt
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+.venv/
+venv/
+env/
+
+# Logs
+*.log
+logs/
+/var/log/
+
+# Packet captures
+*.pcap
+*.pcapng
+*.cap
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor / IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.classpath
+
+# Docker volumes / data
+data/
+opensearch-data/
+iris-uploads/
+velociraptor-data/
+
+# Test outputs
+*.junit.xml
+coverage/
+.coverage
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak

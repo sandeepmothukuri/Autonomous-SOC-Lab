@@ -1,0 +1,185 @@
+<svg viewBox="0 0 1200 820" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI',Arial,sans-serif">
+  <rect width="1200" height="820" fill="#0d1117"/>
+  <!-- Title -->
+  <text x="600" y="36" fill="#ffffff" font-size="20" font-weight="bold" text-anchor="middle">Autonomous SOC Lab — Architecture</text>
+  <text x="600" y="58" fill="#8b949e" font-size="13" text-anchor="middle">Docker Network: 172.20.0.0/24  |  8 Integrated Services  |  MITRE ATT&amp;CK Aligned</text>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- ZONE 1: DATA SOURCES (top) -->
+  <rect x="20" y="78" width="1160" height="120" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="40" y="100" fill="#8b949e" font-size="12" font-weight="bold">DATA SOURCES</text>
+  <!-- Source boxes -->
+  <rect x="40" y="108" width="130" height="72" rx="6" fill="#21262d" stroke="#388bfd" stroke-width="1.5"/>
+  <text x="105" y="130" fill="#58a6ff" font-size="11" text-anchor="middle" font-weight="bold">🖥  Windows</text>
+  <text x="105" y="148" fill="#8b949e" font-size="10" text-anchor="middle">Sysmon + WinEvtx</text>
+  <text x="105" y="163" fill="#8b949e" font-size="10" text-anchor="middle">EventID 1,3,7,11</text>
+
+  <rect x="190" y="108" width="130" height="72" rx="6" fill="#21262d" stroke="#388bfd" stroke-width="1.5"/>
+  <text x="255" y="130" fill="#58a6ff" font-size="11" text-anchor="middle" font-weight="bold">🐧  Linux</text>
+  <text x="255" y="148" fill="#8b949e" font-size="10" text-anchor="middle">auth.log / syslog</text>
+  <text x="255" y="163" fill="#8b949e" font-size="10" text-anchor="middle">auditd / journald</text>
+
+  <rect x="340" y="108" width="130" height="72" rx="6" fill="#21262d" stroke="#388bfd" stroke-width="1.5"/>
+  <text x="405" y="130" fill="#58a6ff" font-size="11" text-anchor="middle" font-weight="bold">🌐  Network</text>
+  <text x="405" y="148" fill="#8b949e" font-size="10" text-anchor="middle">Firewall / IDS</text>
+  <text x="405" y="163" fill="#8b949e" font-size="10" text-anchor="middle">DNS / Proxy logs</text>
+
+  <rect x="490" y="108" width="130" height="72" rx="6" fill="#21262d" stroke="#388bfd" stroke-width="1.5"/>
+  <text x="555" y="130" fill="#58a6ff" font-size="11" text-anchor="middle" font-weight="bold">🔴  Caldera</text>
+  <text x="555" y="148" fill="#8b949e" font-size="10" text-anchor="middle">Attack Simulation</text>
+  <text x="555" y="163" fill="#8b949e" font-size="10" text-anchor="middle">APT29 TTPs</text>
+
+  <rect x="640" y="108" width="130" height="72" rx="6" fill="#21262d" stroke="#388bfd" stroke-width="1.5"/>
+  <text x="705" y="130" fill="#58a6ff" font-size="11" text-anchor="middle" font-weight="bold">🔬  Velociraptor</text>
+  <text x="705" y="148" fill="#8b949e" font-size="10" text-anchor="middle">EDR Agent Telemetry</text>
+  <text x="705" y="163" fill="#8b949e" font-size="10" text-anchor="middle">Live Hunt Artifacts</text>
+
+  <rect x="790" y="108" width="130" height="72" rx="6" fill="#21262d" stroke="#388bfd" stroke-width="1.5"/>
+  <text x="855" y="130" fill="#58a6ff" font-size="11" text-anchor="middle" font-weight="bold">☁️  Cloud/App</text>
+  <text x="855" y="148" fill="#8b949e" font-size="10" text-anchor="middle">AWS CloudTrail</text>
+  <text x="855" y="163" fill="#8b949e" font-size="10" text-anchor="middle">K8s audit logs</text>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- VECTOR arrow down -->
+  <line x1="600" y1="198" x2="600" y2="225" stroke="#3fb950" stroke-width="2"/>
+  <polygon points="594,221 600,233 606,221" fill="#3fb950"/>
+  <rect x="520" y="210" width="160" height="18" rx="4" fill="#0d1f12"/>
+  <text x="600" y="222" fill="#3fb950" font-size="10" text-anchor="middle">Vector Log Pipeline</text>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- ZONE 2: PIPELINE (Vector) -->
+  <rect x="350" y="235" width="500" height="80" rx="8" fill="#0d1f12" stroke="#3fb950" stroke-width="2"/>
+  <text x="600" y="260" fill="#3fb950" font-size="14" font-weight="bold" text-anchor="middle">⚙  Vector  (Log Pipeline)</text>
+  <text x="600" y="278" fill="#8b949e" font-size="11" text-anchor="middle">Sources → Transforms (remap VTL) → Sinks</text>
+  <text x="600" y="295" fill="#8b949e" font-size="10" text-anchor="middle">vector.toml  |  172.20.0.12:8686  |  Gzip compressed to OpenSearch</text>
+
+  <!-- Arrow down to SIEM -->
+  <line x1="600" y1="315" x2="600" y2="348" stroke="#58a6ff" stroke-width="2"/>
+  <polygon points="594,344 600,356 606,344" fill="#58a6ff"/>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- ZONE 3: SIEM -->
+  <rect x="350" y="358" width="500" height="80" rx="8" fill="#0b1f3a" stroke="#388bfd" stroke-width="2"/>
+  <text x="600" y="384" fill="#58a6ff" font-size="14" font-weight="bold" text-anchor="middle">📊  OpenSearch  (SIEM)</text>
+  <text x="600" y="402" fill="#8b949e" font-size="11" text-anchor="middle">Dashboards  |  Index: logs-YYYY-MM-DD  |  1 Node</text>
+  <text x="600" y="418" fill="#8b949e" font-size="10" text-anchor="middle">172.20.0.10:9200  |  Dashboards: 172.20.0.11:5601</text>
+
+  <!-- ElastAlert2 arrow from SIEM -->
+  <line x1="850" y1="398" x2="920" y2="398" stroke="#f0883e" stroke-width="2"/>
+  <polygon points="916,392 928,398 916,404" fill="#f0883e"/>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- ElastAlert2 (right side) -->
+  <rect x="928" y="358" width="230" height="80" rx="8" fill="#2d1b0e" stroke="#f0883e" stroke-width="2"/>
+  <text x="1043" y="384" fill="#f0883e" font-size="13" font-weight="bold" text-anchor="middle">🔔  ElastAlert2</text>
+  <text x="1043" y="402" fill="#8b949e" font-size="11" text-anchor="middle">Detection Engine</text>
+  <text x="1043" y="418" fill="#8b949e" font-size="10" text-anchor="middle">4 Rules: brute_force, powershell</text>
+  <text x="1043" y="432" fill="#8b949e" font-size="10" text-anchor="middle">priv_esc, lateral_movement</text>
+
+  <!-- ElastAlert2 → StackStorm -->
+  <line x1="1043" y1="438" x2="1043" y2="480" stroke="#f0883e" stroke-width="2"/>
+  <polygon points="1037,476 1043,488 1049,476" fill="#f0883e"/>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- ZONE 4: SOAR (StackStorm) bottom-right -->
+  <rect x="928" y="488" width="230" height="90" rx="8" fill="#1a1400" stroke="#e3b341" stroke-width="2"/>
+  <text x="1043" y="514" fill="#e3b341" font-size="13" font-weight="bold" text-anchor="middle">⚡  StackStorm  (SOAR)</text>
+  <text x="1043" y="532" fill="#8b949e" font-size="11" text-anchor="middle">Orquesta Workflows</text>
+  <text x="1043" y="548" fill="#8b949e" font-size="10" text-anchor="middle">enrich_ip → decision</text>
+  <text x="1043" y="562" fill="#8b949e" font-size="10" text-anchor="middle">block_ip → create_iris_case</text>
+  <text x="1043" y="574" fill="#8b949e" font-size="10" text-anchor="middle">172.20.0.14:9101</text>
+
+  <!-- StackStorm → IRIS -->
+  <line x1="928" y1="533" x2="730" y2="533" stroke="#e3b341" stroke-width="2"/>
+  <polygon points="734,527 722,533 734,539" fill="#e3b341"/>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- DFIR-IRIS (bottom-centre) -->
+  <rect x="460" y="490" width="260" height="80" rx="8" fill="#1a0a2e" stroke="#d2a8ff" stroke-width="2"/>
+  <text x="590" y="516" fill="#d2a8ff" font-size="13" font-weight="bold" text-anchor="middle">📂  DFIR-IRIS  (Cases)</text>
+  <text x="590" y="534" fill="#8b949e" font-size="11" text-anchor="middle">Case Management + Timeline</text>
+  <text x="590" y="550" fill="#8b949e" font-size="10" text-anchor="middle">PostgreSQL backend</text>
+  <text x="590" y="564" fill="#8b949e" font-size="10" text-anchor="middle">172.20.0.15:8000</text>
+
+  <!-- IRIS arrows down -->
+  <!-- IRIS → MISP -->
+  <line x1="460" y1="533" x2="350" y2="533" stroke="#d2a8ff" stroke-width="1.5" stroke-dasharray="5,3"/>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- MISP (bottom-left) -->
+  <rect x="40" y="488" width="300" height="90" rx="8" fill="#0d1f1a" stroke="#3fb950" stroke-width="2"/>
+  <text x="190" y="514" fill="#3fb950" font-size="13" font-weight="bold" text-anchor="middle">🌐  MISP  (Threat Intel)</text>
+  <text x="190" y="532" fill="#8b949e" font-size="11" text-anchor="middle">IOC Feeds: CIRCL, Abuse.ch, OTX</text>
+  <text x="190" y="548" fill="#8b949e" font-size="10" text-anchor="middle">STIX2 / MITRE ATT&amp;CK galaxy</text>
+  <text x="190" y="562" fill="#8b949e" font-size="10" text-anchor="middle">172.20.0.17:8080  |  MySQL backend</text>
+  <text x="190" y="574" fill="#8b949e" font-size="10" text-anchor="middle">Exports → OSQuery packs + Wazuh CDB</text>
+
+  <!-- MISP → OpenSearch (threat enrichment) -->
+  <line x1="190" y1="488" x2="190" y2="430" stroke="#3fb950" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <line x1="190" y1="430" x2="350" y2="398" stroke="#3fb950" stroke-width="1.5" stroke-dasharray="5,3"/>
+
+  <!-- Velociraptor EDR (bottom) -->
+  <rect x="350" y="610" width="500" height="80" rx="8" fill="#1a1500" stroke="#e3b341" stroke-width="1.5"/>
+  <text x="600" y="635" fill="#e3b341" font-size="13" font-weight="bold" text-anchor="middle">🔬  Velociraptor  (EDR / DFIR)</text>
+  <text x="600" y="653" fill="#8b949e" font-size="11" text-anchor="middle">Live endpoint forensics  |  VQL hunts  |  Memory analysis</text>
+  <text x="600" y="669" fill="#8b949e" font-size="10" text-anchor="middle">Server: 172.20.0.19:8889  |  Agent → endpoint  |  Artifacts → IRIS cases</text>
+  <text x="600" y="683" fill="#8b949e" font-size="10" text-anchor="middle">Hunt: psh_dropper, lsass_access, sched_tasks</text>
+
+  <!-- Velociraptor → IRIS -->
+  <line x1="590" y1="610" x2="590" y2="570" stroke="#e3b341" stroke-width="1.5" stroke-dasharray="5,3"/>
+
+  <!-- Velociraptor → MISP (IOC push) -->
+  <line x1="350" y1="650" x2="345" y2="650" stroke="#e3b341" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="345" y1="650" x2="345" y2="540" stroke="#e3b341" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="345" y1="540" x2="340" y2="540" stroke="#e3b341" stroke-width="1" stroke-dasharray="3,3"/>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- CI/CD GitHub Actions -->
+  <rect x="40" y="610" width="290" height="80" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="185" y="635" fill="#8b949e" font-size="13" font-weight="bold" text-anchor="middle">🔄  GitHub Actions  (CI)</text>
+  <text x="185" y="653" fill="#8b949e" font-size="10" text-anchor="middle">shellcheck | flake8 | bandit</text>
+  <text x="185" y="668" fill="#8b949e" font-size="10" text-anchor="middle">yamllint | docker-compose validate</text>
+  <text x="185" y="682" fill="#8b949e" font-size="10" text-anchor="middle">structure-check | secret-scan</text>
+
+  <!-- Caldera box -->
+  <rect x="860" y="610" width="300" height="80" rx="8" fill="#1a0a0a" stroke="#da3633" stroke-width="1.5"/>
+  <text x="1010" y="635" fill="#da3633" font-size="13" font-weight="bold" text-anchor="middle">🎯  MITRE Caldera</text>
+  <text x="1010" y="653" fill="#8b949e" font-size="10" text-anchor="middle">Attack Simulation: APT29, Ransomware</text>
+  <text x="1010" y="668" fill="#8b949e" font-size="10" text-anchor="middle">Sandcat agents  |  Kill chain replay</text>
+  <text x="1010" y="682" fill="#8b949e" font-size="10" text-anchor="middle">Port 8888  |  Detection validation</text>
+
+  <!-- Caldera → Vector (generates logs) -->
+  <line x1="1010" y1="610" x2="850" y2="395" stroke="#da3633" stroke-width="1.5" stroke-dasharray="5,3"/>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- Legend -->
+  <rect x="20" y="712" width="1160" height="95" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="40" y="734" fill="#8b949e" font-size="11" font-weight="bold">LEGEND</text>
+  <!-- Data flow -->
+  <line x1="40" y1="754" x2="100" y2="754" stroke="#3fb950" stroke-width="2"/>
+  <text x="108" y="758" fill="#8b949e" font-size="10">Primary data flow</text>
+  <line x1="200" y1="754" x2="260" y2="754" stroke="#58a6ff" stroke-width="2" stroke-dasharray="5,3"/>
+  <text x="268" y="758" fill="#8b949e" font-size="10">Enrichment / IOC sync</text>
+  <line x1="380" y1="754" x2="440" y2="754" stroke="#f0883e" stroke-width="2"/>
+  <text x="448" y="758" fill="#8b949e" font-size="10">Alert trigger</text>
+  <line x1="540" y1="754" x2="600" y2="754" stroke="#e3b341" stroke-width="2"/>
+  <text x="608" y="758" fill="#8b949e" font-size="10">SOAR automation</text>
+  <line x1="700" y1="754" x2="760" y2="754" stroke="#da3633" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="768" y="758" fill="#8b949e" font-size="10">Attack simulation (red team)</text>
+
+  <!-- Components -->
+  <text x="40" y="786" fill="#8b949e" font-size="11" font-weight="bold">COMPONENTS</text>
+  <rect x="40" y="792" width="90" height="14" rx="3" fill="#0b1f3a" stroke="#388bfd" stroke-width="1"/>
+  <text x="85" y="803" fill="#58a6ff" font-size="9" text-anchor="middle">SIEM</text>
+  <rect x="145" y="792" width="90" height="14" rx="3" fill="#0d1f12" stroke="#3fb950" stroke-width="1"/>
+  <text x="190" y="803" fill="#3fb950" font-size="9" text-anchor="middle">Pipeline / TI</text>
+  <rect x="250" y="792" width="90" height="14" rx="3" fill="#1a1400" stroke="#e3b341" stroke-width="1"/>
+  <text x="295" y="803" fill="#e3b341" font-size="9" text-anchor="middle">SOAR / EDR</text>
+  <rect x="355" y="792" width="90" height="14" rx="3" fill="#1a0a2e" stroke="#d2a8ff" stroke-width="1"/>
+  <text x="400" y="803" fill="#d2a8ff" font-size="9" text-anchor="middle">Case Mgmt</text>
+  <rect x="460" y="792" width="90" height="14" rx="3" fill="#2d1b0e" stroke="#f0883e" stroke-width="1"/>
+  <text x="505" y="803" fill="#f0883e" font-size="9" text-anchor="middle">Detection</text>
+  <rect x="565" y="792" width="90" height="14" rx="3" fill="#1a0a0a" stroke="#da3633" stroke-width="1"/>
+  <text x="610" y="803" fill="#da3633" font-size="9" text-anchor="middle">Red Team</text>
+  <text x="720" y="803" fill="#8b949e" font-size="10">Docker subnet: 172.20.0.0/24  |  9 containers  |  ~8GB RAM total</text>
+</svg>

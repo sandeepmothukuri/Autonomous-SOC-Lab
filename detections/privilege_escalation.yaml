@@ -1,0 +1,78 @@
+# =============================================================================
+# Detection: Privilege Escalation / SUID Abuse
+# MITRE ATT&CK: T1548 — Abuse Elevation Control Mechanism
+# Severity: High
+# Author: SOC Lab
+# =============================================================================
+
+name: Privilege Escalation Attempt
+type: any
+
+index: logs-*
+
+filter:
+  - bool:
+      should:
+        # Sudo abuse
+        - bool:
+            must:
+              - term:
+                  event.type: "privilege_use"
+              - query_string:
+                  query: "message:(sudo AND (NOPASSWD OR -i OR su))"
+        # New SUID binary
+        - bool:
+            must:
+              - term:
+                  event.type: "file_change"
+              - term:
+                  file.mode: "4755"
+        # Suspicious parent-child process
+        - bool:
+            must:
+              - term:
+                  event.type: "process_creation"
+              - query_string:
+                  query: "process.parent.name:(apache2 OR nginx OR httpd) AND process.name:(bash OR sh OR python)"
+
+realert:
+  minutes: 15
+
+alert:
+  - post
+
+http_post_url: "http://stackstorm:9101/v1/webhooks/elastalert"
+http_post_payload:
+  host_name: host.name
+  user_name: user.name
+  event_type: event.type
+  command_line: process.command_line
+  file_path: file.path
+http_post_static_payload:
+  alert_name: "Privilege Escalation Attempt"
+  alert_id: "privilege-escalation-t1548"
+  severity: "high"
+  mitre_technique: "T1548"
+http_post_headers:
+  Content-Type: "application/json"
+  X-SOC-Source: "elastalert"
+
+alert_text: |
+  ⚠️ PRIVILEGE ESCALATION ATTEMPT
+
+  Host:    {host.name}
+  User:    {user.name}
+  Action:  {event.type}
+  Command: {process.command_line}
+
+  MITRE ATT&CK: T1548
+  Severity: HIGH
+
+alert_text_type: alert_text_only
+
+include:
+  - host.name
+  - user.name
+  - event.type
+  - process.command_line
+  - file.path

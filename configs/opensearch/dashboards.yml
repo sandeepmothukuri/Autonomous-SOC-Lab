@@ -1,0 +1,28 @@
+# OpenSearch Dashboards Configuration
+# Autonomous SOC Lab
+
+server.host: "0.0.0.0"
+server.port: 5601
+server.name: "autonomous-soc-dashboards"
+
+# OpenSearch backend connection
+opensearch.hosts: ["http://opensearch:9200"]
+opensearch.requestHeadersWhitelist: [authorization, securitytenant]
+
+# Security — disabled for lab
+opensearch_security.disabled: true
+
+# Logging
+logging.verbose: false
+logging.quiet: false
+
+# Misc
+newsfeed.enabled: false
+telemetry.enabled: false
+telemetry.optIn: false
+
+# UI theme
+opensearchDashboards.defaultAppId: "dashboards"
+
+# Index patterns
+opensearchDashboards.index: ".opensearch_dashboards"
