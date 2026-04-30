@@ -4,12 +4,12 @@
 
 ### *Production-Grade Security Operations Center — 100% Open Source*
 
-[![CI](https://github.com/sandeepmothukuri/autonomous-soc-lab/actions/workflows/validate.yml/badge.svg)](https://github.com/sandeepmothukuri/autonomous-soc-lab/actions)
+[![CI](https://github.com/sandeepmothukuri/Autonomous-SOC-Lab1/actions/workflows/validate.yml/badge.svg)](https://github.com/sandeepmothukuri/Autonomous-SOC-Lab1/actions)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://docs.docker.com/compose/)
 [![OpenSearch](https://img.shields.io/badge/SIEM-OpenSearch-005EB8?logo=opensearch&logoColor=white)](https://opensearch.org/)
 [![MITRE ATT&CK](https://img.shields.io/badge/MITRE-ATT%26CK-red)](https://attack.mitre.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Stars](https://img.shields.io/github/stars/sandeepmothukuri/autonomous-soc-lab?style=social)](https://github.com/sandeepmothukuri/autonomous-soc-lab)
+[![Stars](https://img.shields.io/github/stars/sandeepmothukuri/Autonomous-SOC-Lab1?style=social)](https://github.com/sandeepmothukuri/Autonomous-SOC-Lab1)
 
 > **An enterprise-grade, fully autonomous SOC platform** built with modern open-source tools.  
 > Detects real threats. Responds automatically. Investigates forensically. Simulates adversaries.  
@@ -98,27 +98,27 @@ Endpoints (Windows/Linux/Network)
 ## 📸 Screenshots
 
 ### SOC Overview Dashboard
-![SOC Dashboard](screenshots/01-soc-dashboard.svg)
+![SOC Dashboard](screenshots/01-soc-dashboard.png)
 *Real-time alert KPIs, 24-hour event volume, MITRE ATT&CK heatmap — OpenSearch Dashboards*
 
 ### Alert Detail Panel
-![Alert Panel](screenshots/02-alert-panel.svg)
+![Alert Panel](screenshots/02-alert-panel.png)
 *Critical alert: Suspicious PowerShell Execution — decoded payload, attack timeline, action buttons*
 
 ### SOAR Automation Workflow
-![SOAR Workflow](screenshots/03-soar-workflow.svg)
+![SOAR Workflow](screenshots/03-soar-workflow.png)
 *StackStorm Orquesta workflow: Alert → IP Enrich → MISP Intel → Decision → Block → IRIS Case (2.4 seconds)*
 
 ### Incident Case Management
-![Incident Case](screenshots/04-incident-case.svg)
+![Incident Case](screenshots/04-incident-case.png)
 *DFIR-IRIS case: evidence artifacts, IOC table, investigation timeline, MITRE techniques*
 
 ### Threat Intelligence Platform
-![Threat Intel](screenshots/05-threat-intel.svg)
+![Threat Intel](screenshots/05-threat-intel.png)
 *MISP: APT29 event with 47 IOCs, correlation graph, live feed stats, integration actions*
 
 ### Red Team Attack Simulation
-![Attack Simulation](screenshots/06-attack-simulation.svg)
+![Attack Simulation](screenshots/06-attack-simulation.png)
 *MITRE Caldera: APT29 kill chain, Sandcat agents, blue team detection score (75% coverage)*
 
 ---
@@ -150,7 +150,7 @@ Endpoints (Windows/Linux/Network)
 ### 1. Clone and configure
 
 ```bash
-git clone https://github.com/sandeepmothukuri/autonomous-soc-lab.git
+git clone https://github.com/sandeepmothukuri/Autonomous-SOC-Lab1.git
 cd autonomous-soc-lab
 
 # Copy and edit environment variables
