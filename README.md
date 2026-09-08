@@ -151,7 +151,7 @@ Endpoints (Windows/Linux/Network)
 
 ```bash
 git clone https://github.com/sandeepmothukuri/Autonomous-SOC-Lab1.git
-cd autonomous-soc-lab
+cd autonomous-SOC-Detection-and-Threat-Hunting-Lab
 
 # Copy and edit environment variables
 cp .env.example .env
@@ -306,7 +306,7 @@ curl -H "KEY: ${CALDERA_KEY}" \
 ## 📁 Repository Structure
 
 ```
-autonomous-soc-lab/
+autonomous-SOC-Detection-and-Threat-Hunting-Lab/
 ├── pipeline/
 │   └── vector.toml              # Log collection + parsing pipeline
 ├── detections/
@@ -431,10 +431,10 @@ MIT License — free to use, fork, and build upon.
 
 | Repository | Description |
 |---|---|
-| [ai-soc-lab](https://github.com/sandeepmothukuri/ai-soc-lab) | AI-augmented SOC with Wazuh + TheHive + Ollama (LLaMA3) for automated triage |
-| [advanced-soc-lab-v2.0](https://github.com/sandeepmothukuri/advanced-soc-lab-v2.0) | 12-tool SOC lab with OpenSearch, Suricata, Zeek, MISP, Caldera, Velociraptor |
+| [ai-SOC-Detection-and-Threat-Hunting-Lab](https://github.com/sandeepmothukuri/ai-SOC-Detection-and-Threat-Hunting-Lab) | AI-augmented SOC with Wazuh + TheHive + Ollama (LLaMA3) for automated triage |
+| [advanced-SOC-Detection-and-Threat-Hunting-Lab-v2.0](https://github.com/sandeepmothukuri/advanced-SOC-Detection-and-Threat-Hunting-Lab-v2.0) | 12-tool SOC lab with OpenSearch, Suricata, Zeek, MISP, Caldera, Velociraptor |
 | [Autonomous-SOC-Lab](https://github.com/sandeepmothukuri/Autonomous-SOC-Lab) | Autonomous SOC with AI-driven detection and self-healing playbooks |
 | [soc-threat-hunting-lab](https://github.com/sandeepmothukuri/soc-threat-hunting-lab) | Threat detection lab — Zeek, RITA, Arkime, Velociraptor, OSQuery, MISP |
-| [soc-lab-free](https://github.com/sandeepmothukuri/soc-lab-free) | Free SOC lab — OpenVAS, Wazuh, pfSense, Proxmox Mail, Lynis |
-| [soc-lab](https://github.com/sandeepmothukuri/soc-lab) | SOC analyst home lab — Wazuh SIEM, Sysmon, MITRE ATT&CK mapping |
+| [SOC-Detection-and-Threat-Hunting-Lab-free](https://github.com/sandeepmothukuri/SOC-Detection-and-Threat-Hunting-Lab-free) | Free SOC lab — OpenVAS, Wazuh, pfSense, Proxmox Mail, Lynis |
+| [SOC-Detection-and-Threat-Hunting-Lab](https://github.com/sandeepmothukuri/SOC-Detection-and-Threat-Hunting-Lab) | SOC analyst home lab — Wazuh SIEM, Sysmon, MITRE ATT&CK mapping |
 | [cyberblue](https://github.com/sandeepmothukuri/cyberblue) | Containerised blue team platform — SIEM, DFIR, CTI, SOAR, Network Analysis |
