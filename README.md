@@ -308,7 +308,7 @@ curl -H "KEY: ${CALDERA_KEY}" \
 ## 📁 Repository Structure
 
 ```
-autonomous-soc-lab/
+autonomous-SOC-Detection-and-Threat-Hunting-Lab/
 ├── pipeline/
 │   └── vector.toml              # Log collection + parsing pipeline
 ├── detections/
