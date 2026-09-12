@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="980" viewBox="0 0 1600 980" role="img" aria-labelledby="title desc">
+  <title id="title">Autonomous SOC Lab — End-to-End Data Flow</title>
+  <desc id="desc">Enterprise security operations data flow from telemetry sources through Vector, OpenSearch, ElastAlert2, StackStorm, MISP, Velociraptor and DFIR-IRIS, with MITRE Caldera validating detection coverage.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#07111f"/><stop offset="1" stop-color="#0d1726"/></linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000" flood-opacity=".35"/></filter>
+    <marker id="arrow-blue" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 Z" fill="#58a6ff"/></marker>
+    <marker id="arrow-green" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 Z" fill="#3fb950"/></marker>
+    <marker id="arrow-orange" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 Z" fill="#f0883e"/></marker>
+    <marker id="arrow-gold" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 Z" fill="#e3b341"/></marker>
+    <marker id="arrow-purple" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 Z" fill="#d2a8ff"/></marker>
+    <style>
+      .title{font:700 30px 'Segoe UI',Arial,sans-serif;fill:#fff}.subtitle{font:400 14px 'Segoe UI',Arial,sans-serif;fill:#8b949e}
+      .zone{font:700 12px 'Segoe UI',Arial,sans-serif;fill:#8b949e;letter-spacing:1.5px}.head{font:700 17px 'Segoe UI',Arial,sans-serif}
+      .body{font:400 12px 'Segoe UI',Arial,sans-serif;fill:#aab4c0}.small{font:400 11px 'Segoe UI',Arial,sans-serif;fill:#8b949e}
+      .source{fill:#111c2b;stroke:#388bfd;stroke-width:1.5}.pipeline{fill:#0d2417;stroke:#3fb950;stroke-width:2}.siem{fill:#0b1f3a;stroke:#58a6ff;stroke-width:2}
+      .detect{fill:#2a180d;stroke:#f0883e;stroke-width:2}.soar{fill:#261e08;stroke:#e3b341;stroke-width:2}.intel{fill:#0d241b;stroke:#3fb950;stroke-width:2}
+      .dfir{fill:#211330;stroke:#d2a8ff;stroke-width:2}.emulation{fill:#261116;stroke:#f85149;stroke-width:2}
+    </style>
+  </defs>
+
+  <rect width="1600" height="980" rx="18" fill="url(#bg)"/>
+  <text x="800" y="48" text-anchor="middle" class="title">Autonomous SOC Lab — End-to-End Data Flow</text>
+  <text x="800" y="74" text-anchor="middle" class="subtitle">Telemetry → Normalisation → Detection → Enrichment → Decision → Response → Investigation → Validation</text>
+
+  <!-- 01 Telemetry -->
+  <rect x="45" y="105" width="1510" height="145" rx="14" fill="#0a1320" stroke="#25364d"/>
+  <text x="70" y="132" class="zone">01 · TELEMETRY SOURCES</text>
+  <g filter="url(#shadow)">
+    <rect x="70" y="150" width="210" height="72" rx="10" class="source"/><text x="175" y="174" text-anchor="middle" class="head" fill="#58a6ff">Windows</text><text x="175" y="194" text-anchor="middle" class="small">Sysmon · Windows Events</text><text x="175" y="210" text-anchor="middle" class="small">Process / Network / File</text>
+    <rect x="300" y="150" width="210" height="72" rx="10" class="source"/><text x="405" y="174" text-anchor="middle" class="head" fill="#58a6ff">Linux</text><text x="405" y="194" text-anchor="middle" class="small">auth.log · syslog</text><text x="405" y="210" text-anchor="middle" class="small">auditd · journald</text>
+    <rect x="530" y="150" width="210" height="72" rx="10" class="source"/><text x="635" y="174" text-anchor="middle" class="head" fill="#58a6ff">Network</text><text x="635" y="194" text-anchor="middle" class="small">Firewall · IDS · DNS</text><text x="635" y="210" text-anchor="middle" class="small">Proxy / Flow telemetry</text>
+    <rect x="760" y="150" width="210" height="72" rx="10" class="source"/><text x="865" y="174" text-anchor="middle" class="head" fill="#f85149">MITRE Caldera</text><text x="865" y="194" text-anchor="middle" class="small">Controlled adversary activity</text><text x="865" y="210" text-anchor="middle" class="small">ATT&amp;CK technique validation</text>
+    <rect x="990" y="150" width="210" height="72" rx="10" class="source"/><text x="1095" y="174" text-anchor="middle" class="head" fill="#e3b341">Velociraptor</text><text x="1095" y="194" text-anchor="middle" class="small">Endpoint / EDR telemetry</text><text x="1095" y="210" text-anchor="middle" class="small">Live hunt artifacts</text>
+    <rect x="1220" y="150" width="260" height="72" rx="10" class="source"/><text x="1350" y="174" text-anchor="middle" class="head" fill="#58a6ff">Cloud / Applications</text><text x="1350" y="194" text-anchor="middle" class="small">CloudTrail · Kubernetes · App logs</text><text x="1350" y="210" text-anchor="middle" class="small">Identity / service telemetry</text>
+  </g>
+
+  <!-- Main path -->
+  <line x1="800" y1="250" x2="800" y2="285" stroke="#58a6ff" stroke-width="3" marker-end="url(#arrow-blue)"/>
+
+  <!-- 02 Collection -->
+  <rect x="520" y="290" width="560" height="100" rx="14" class="pipeline" filter="url(#shadow)"/>
+  <text x="800" y="320" text-anchor="middle" class="head" fill="#3fb950">02 · VECTOR — COLLECTION &amp; NORMALISATION</text>
+  <text x="800" y="344" text-anchor="middle" class="body">Collect → Parse → Remap / Enrich → Normalise → Ship</text>
+  <text x="800" y="366" text-anchor="middle" class="small">Structured security events · field contracts · consistent timestamps / metadata</text>
+
+  <line x1="800" y1="390" x2="800" y2="425" stroke="#58a6ff" stroke-width="3" marker-end="url(#arrow-blue)"/>
+
+  <!-- 03 SIEM -->
+  <rect x="520" y="430" width="560" height="105" rx="14" class="siem" filter="url(#shadow)"/>
+  <text x="800" y="460" text-anchor="middle" class="head" fill="#58a6ff">03 · OPENSEARCH — SIEM</text>
+  <text x="800" y="484" text-anchor="middle" class="body">Index → Search → Correlate → Dashboard</text>
+  <text x="800" y="506" text-anchor="middle" class="small">Central event store · alert context · analyst visibility</text>
+  <text x="800" y="522" text-anchor="middle" class="small">logs-* · OpenSearch Dashboards</text>
+
+  <!-- SIEM to detection -->
+  <line x1="1080" y1="482" x2="1195" y2="482" stroke="#f0883e" stroke-width="3" marker-end="url(#arrow-orange)"/>
+
+  <!-- 04 Detection -->
+  <rect x="1200" y="430" width="330" height="105" rx="14" class="detect" filter="url(#shadow)"/>
+  <text x="1365" y="460" text-anchor="middle" class="head" fill="#f0883e">04 · ELASTALERT2</text>
+  <text x="1365" y="484" text-anchor="middle" class="body">Deterministic detection rules</text>
+  <text x="1365" y="505" text-anchor="middle" class="small">Brute Force · PowerShell · Priv Esc</text>
+  <text x="1365" y="521" text-anchor="middle" class="small">Lateral Movement · ATT&amp;CK mapping</text>
+
+  <!-- Detection to SOAR -->
+  <line x1="1365" y1="535" x2="1365" y2="600" stroke="#f0883e" stroke-width="3" marker-end="url(#arrow-orange)"/>
+
+  <!-- 05 SOAR -->
+  <rect x="1110" y="605" width="420" height="125" rx="14" class="soar" filter="url(#shadow)"/>
+  <text x="1320" y="636" text-anchor="middle" class="head" fill="#e3b341">05 · STACKSTORM — SOAR</text>
+  <text x="1320" y="660" text-anchor="middle" class="body">Webhook → Enrichment → Decision Gate</text>
+  <text x="1320" y="682" text-anchor="middle" class="small">Simulation · Approval · Active Response</text>
+  <text x="1320" y="700" text-anchor="middle" class="small">Block / isolate → create IRIS case → notify</text>
+  <text x="1320" y="716" text-anchor="middle" class="small">Auditable, policy-controlled orchestration</text>
+
+  <!-- MISP enrichment loop -->
+  <rect x="650" y="605" width="410" height="125" rx="14" class="intel" filter="url(#shadow)"/>
+  <text x="855" y="636" text-anchor="middle" class="head" fill="#3fb950">THREAT INTELLIGENCE</text>
+  <text x="855" y="660" text-anchor="middle" class="body">MISP — IOC enrichment &amp; correlation</text>
+  <text x="855" y="682" text-anchor="middle" class="small">Reputation · Context · STIX / ATT&amp;CK</text>
+  <text x="855" y="700" text-anchor="middle" class="small">Feeds inform the SOAR decision gate</text>
+  <text x="855" y="716" text-anchor="middle" class="small">External enrichment remains optional</text>
+
+  <line x1="1110" y1="667" x2="1060" y2="667" stroke="#3fb950" stroke-width="2.5" marker-end="url(#arrow-green)"/>
+  <path d="M650 690 C560 690 560 515 520 515" fill="none" stroke="#3fb950" stroke-width="2" stroke-dasharray="8 6" marker-end="url(#arrow-green)"/>
+
+  <!-- 06 Investigation -->
+  <line x1="1110" y1="730" x2="1110" y2="790" stroke="#d2a8ff" stroke-width="3" marker-end="url(#arrow-purple)"/>
+  <rect x="820" y="795" width="580" height="105" rx="14" class="dfir" filter="url(#shadow)"/>
+  <text x="1110" y="825" text-anchor="middle" class="head" fill="#d2a8ff">06 · DFIR-IRIS — CASE MANAGEMENT</text>
+  <text x="1110" y="849" text-anchor="middle" class="body">Incident → Evidence → Timeline → IOC → Analyst Notes</text>
+  <text x="1110" y="871" text-anchor="middle" class="small">Central investigation record and response traceability</text>
+  <text x="1110" y="887" text-anchor="middle" class="small">Velociraptor artifacts can feed endpoint investigation</text>
+
+  <!-- Velociraptor investigation branch -->
+  <rect x="180" y="795" width="580" height="105" rx="14" class="soar" filter="url(#shadow)"/>
+  <text x="470" y="825" text-anchor="middle" class="head" fill="#e3b341">ENDPOINT INVESTIGATION</text>
+  <text x="470" y="849" text-anchor="middle" class="body">Velociraptor — VQL hunts &amp; forensic collection</text>
+  <text x="470" y="871" text-anchor="middle" class="small">Process · persistence · network · memory · artifacts</text>
+  <text x="470" y="887" text-anchor="middle" class="small">Collected evidence → DFIR-IRIS case</text>
+
+  <line x1="760" y1="847" x2="820" y2="847" stroke="#e3b341" stroke-width="2.5" marker-end="url(#arrow-gold)"/>
+
+  <!-- Validation feedback -->
+  <path d="M180 795 C90 690 90 330 520 330" fill="none" stroke="#f85149" stroke-width="2.5" stroke-dasharray="9 7" marker-end="url(#arrow-blue)"/>
+  <rect x="65" y="455" width="300" height="115" rx="14" class="emulation" filter="url(#shadow)"/>
+  <text x="215" y="486" text-anchor="middle" class="head" fill="#f85149">07 · VALIDATION LOOP</text>
+  <text x="215" y="510" text-anchor="middle" class="body">MITRE Caldera</text>
+  <text x="215" y="530" text-anchor="middle" class="small">Controlled adversary emulation</text>
+  <text x="215" y="548" text-anchor="middle" class="small">TTP execution → telemetry → detection</text>
+  <text x="215" y="564" text-anchor="middle" class="small">Coverage measurement → tune rules → repeat</text>
+
+  <!-- Legend -->
+  <rect x="65" y="620" width="500" height="105" rx="12" fill="#0a1320" stroke="#25364d"/>
+  <text x="90" y="648" class="zone">DATA FLOW LEGEND</text>
+  <line x1="90" y1="670" x2="145" y2="670" stroke="#58a6ff" stroke-width="3" marker-end="url(#arrow-blue)"/><text x="160" y="675" class="small">Primary telemetry / processing path</text>
+  <line x1="90" y1="695" x2="145" y2="695" stroke="#3fb950" stroke-width="2.5" stroke-dasharray="8 6" marker-end="url(#arrow-green)"/><text x="160" y="700" class="small">Enrichment / intelligence feedback</text>
+  <line x1="90" y1="720" x2="145" y2="720" stroke="#f85149" stroke-width="2.5" stroke-dasharray="9 7" marker-end="url(#arrow-blue)"/><text x="160" y="725" class="small">Validation / detection coverage loop</text>
+</svg>
