@@ -81,52 +81,15 @@ The architecture separates telemetry collection, deterministic detection, respon
 
 ### End-to-End Data Flow
 
-```text
-┌─────────────────────────────────────────────────────────────────────┐
-│                         DATA SOURCES                                │
-│ Windows • Linux • Network • Cloud • Applications • Caldera         │
-└──────────────────────────────┬──────────────────────────────────────┘
-                               │
-                               ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│ Vector                                                            │
-│ Collection → Parsing → Remap / Normalisation → OpenSearch          │
-└──────────────────────────────┬──────────────────────────────────────┘
-                               │
-                               ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│ OpenSearch                                                        │
-│ SIEM • Search • Dashboards • Alert Data                            │
-└──────────────────────────────┬──────────────────────────────────────┘
-                               │
-                               ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│ ElastAlert2                                                       │
-│ ATT&CK-mapped deterministic detections                             │
-└──────────────────────────────┬──────────────────────────────────────┘
-                               │ Webhook
-                               ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│ StackStorm                                                        │
-│ Enrichment → Decision Gate → Response → IRIS Case                 │
-└──────────────┬──────────────────────┬───────────────────────────────┘
-               │                      │
-               ▼                      ▼
-       ┌──────────────┐       ┌─────────────────┐
-       │    MISP      │       │  Velociraptor   │
-       │ Threat Intel │       │    DFIR / EDR   │
-       └──────┬───────┘       └────────┬────────┘
-              │                        │
-              └────────────┬───────────┘
-                           ▼
-                   ┌───────────────┐
-                   │   DFIR-IRIS   │
-                   │ Case / Evidence│
-                   │ Timeline / IOC │
-                   └───────────────┘
+The following diagram shows the complete telemetry-to-response path, including collection, SIEM processing, detection, SOAR orchestration, threat intelligence, DFIR investigation and adversary validation.
 
-MITRE Caldera → Controlled Adversary Emulation → Detection Validation
-```
+<div align="center">
+
+<img src="architecture/end-to-end-data-flow.svg" alt="Autonomous SOC Lab — End-to-End Data Flow" width="100%">
+
+</div>
+
+**Flow:** Telemetry → Collection & Normalisation → SIEM → Detection → SOAR → Enrichment / Decision → Response → DFIR → Validation.
 
 ---
 
@@ -719,7 +682,8 @@ Future and extensible metrics include:
 Autonomous-SOC-Lab/
 │
 ├── architecture/
-│   └── diagram.svg
+│   ├── diagram.svg
+│   └── end-to-end-data-flow.svg
 │
 ├── caldera/
 │   └── red_team.yml
@@ -766,8 +730,6 @@ Autonomous-SOC-Lab/
 │   ├── deployment.md
 │   ├── security.md
 │   ├── detection-engineering.md
-│   ├── soar.md
-│   ├── threat-intelligence.md
 │   ├── incident-response.md
 │   ├── mitre-coverage.md
 │   ├── testing.md
