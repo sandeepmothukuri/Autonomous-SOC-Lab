@@ -13,7 +13,7 @@
 
 **A reproducible open-source SOC engineering platform for building, validating and demonstrating modern detection-and-response operations.**
 
-[Architecture](#-architecture) · [Visual Showcase](#-visual-showcase) · [Detection Engineering](#-detection-engineering) · [SOAR](#-soar-response-automation) · [DFIR](#-dfir--investigation) · [Quick Start](#-quick-start) · [Testing](#-validation--quality)
+[Architecture](#-architecture) · [Visual Showcase](#-visual-showcase) · [Detection Engineering](#-detection-engineering) · [SOAR](#-soar-response-automation) · [DFIR](#-dfir--investigation) · [Quick Start](#-quick-start) · [Testing](#-validation--quality) · [Author](#-author)
 
 </div>
 
@@ -880,6 +880,25 @@ Focus areas:
 - AI-Augmented SOC Operations
 
 This repository is maintained as a practical security engineering environment for designing, testing and validating modern SOC capabilities.
+
+- GitHub: [@sandeepmothukuri](https://github.com/sandeepmothukuri)
+- Website: [cybertechnology.in](https://cybertechnology.in)
+- LinkedIn: [linkedin.com/in/sandeepmothukuri](https://www.linkedin.com/in/sandeepmothukuri)
+- Email: [sandeep.mothukuris@gmail.com](mailto:sandeep.mothukuris@gmail.com)
+
+---
+
+# 🗂️ All Repositories
+
+| Repository | Description |
+|---|---|
+| [AI-Augmented-SOC-Lab](https://github.com/sandeepmothukuri/AI-Augmented-SOC-Lab) | AI-augmented SOC with Wazuh + TheHive + Ollama (LLaMA3) for automated triage |
+| [Enterprise-Detection-Engineering-SOC-Lab](https://github.com/sandeepmothukuri/Enterprise-Detection-Engineering-SOC-Lab) | 12-tool SOC lab with OpenSearch, Suricata, Zeek, MISP, Caldera, Velociraptor |
+| [Autonomous-SOC-Lab](https://github.com/sandeepmothukuri/Autonomous-SOC-Lab) | Autonomous SOC with AI-driven detection and self-healing playbooks |
+| [soc-threat-hunting-lab](https://github.com/sandeepmothukuri/soc-threat-hunting-lab) | Threat detection lab — Zeek, RITA, Arkime, Velociraptor, OSQuery, MISP |
+| [soc-lab-free](https://github.com/sandeepmothukuri/soc-lab-free) | Free SOC lab — OpenVAS, Wazuh, pfSense, Proxmox Mail, Lynis |
+| [SOC-Detection-and-Threat-Hunting-Lab](https://github.com/sandeepmothukuri/SOC-Detection-and-Threat-Hunting-Lab) | SOC analyst home lab — Wazuh, Sysmon, MITRE ATT&CK mapping and incident response |
+| [cyberblue](https://github.com/sandeepmothukuri/cyberblue) | Containerised blue-team platform — SIEM, DFIR, CTI, SOAR, Network Analysis |
 
 ---
 
