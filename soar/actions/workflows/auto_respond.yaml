@@ -1,0 +1,169 @@
+---
+version: 1.0
+description: |
+  Enrich a brute-force source IP using AbuseIPDB (if an API key is configured)
+  and ipinfo (if reachable); fall back gracefully to local/unknown enrichment.
+  Branch on SOC_RESPONSE_MODE (simulation | approval | active) from the
+  StackStorm environment. The default mode, simulation, only logs the
+  intended response — it never modifies a firewall.
+
+input:
+  - src_ip
+  - alert_name
+  - alert_id
+  - severity
+  - count
+
+vars:
+  - country: "unknown"
+  - city: "unknown"
+  - org: "unknown"
+  - threat_score: 0
+  - abuse_reports: 0
+  - iris_case_id: ""
+  - response_mode: "{{ env('SOC_RESPONSE_MODE', 'simulation') }}"
+  - block_msg: ""
+
+tasks:
+  enrich_ipinfo:
+    action: core.http
+    input:
+      url: "https://ipinfo.io/{{ ctx().src_ip }}/json"
+      method: GET
+      timeout: 5
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - country: "{{ result().body.country }}"
+          - city: "{{ result().body.city }}"
+          - org: "{{ result().body.org }}"
+        do: enrich_abuseipdb
+      - when: "{{ failed() }}"
+        do: enrich_abuseipdb
+
+  enrich_abuseipdb:
+    action: core.http
+    input:
+      url: "https://api.abuseipdb.com/api/v2/check"
+      method: GET
+      params:
+        ipAddress: "{{ ctx().src_ip }}"
+        maxAgeInDays: "30"
+      headers:
+        Key: "{{ st2kv('system.abuseipdb_key', default='') }}"
+        Accept: application/json
+      timeout: 5
+    next:
+      - when: "{{ succeeded() and st2kv('system.abuseipdb_key', default='') != '' }}"
+        publish:
+          - threat_score: "{{ result().body.data.abuseConfidenceScore | default(0) }}"
+          - abuse_reports: "{{ result().body.data.totalReports | default(0) }}"
+        do: decision
+      - when: "{{ failed() or st2kv('system.abuseipdb_key', default='') == '' }}"
+        publish:
+          - threat_score: 0
+          - abuse_reports: 0
+        do: decision
+
+  decision:
+    action: core.noop
+    next:
+      # External TI confidence >= 75 OR local high-severity alert from T1110
+      - when: "{{ (ctx().threat_score | int) >= 75 or ctx().severity == 'critical' or (ctx().severity == 'high' and (ctx().count | int) >= 10) }}"
+        do: respond
+      - when: "{{ (ctx().threat_score | int) < 75 }}"
+        do: create_review_case
+
+  respond:
+    action: core.local
+    input:
+      cmd: |
+        echo '--- SOC-RESPONSE (mode={{ ctx().response_mode }}) ---'
+        echo 'Would block source IP {{ ctx().src_ip }} from host'
+        echo 'Threat score: {{ ctx().threat_score }}/100; Abuse reports: {{ ctx().abuse_reports }}'
+        echo 'Reason: auto_contain policy for high-confidence brute-force indicators'
+        {% if ctx().response_mode == 'active' %}
+        echo 'ACTIVE MODE ENABLED: iptables command would be executed here via approved firewall API.'
+        {% elif ctx().response_mode == 'approval' %}
+        echo 'APPROVAL MODE: block requires analyst sign-off in IRIS before execution.'
+        {% else %}
+        echo 'SIMULATION MODE: no firewall changes made.'
+        {% endif %}
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - block_msg: "{{ result().stdout }}"
+        do: create_iris_case
+
+  create_iris_case:
+    action: core.http
+    input:
+      url: "{{ env('IRIS_BASE_URL', 'http://iris:8000') }}/manage/cases/add"
+      method: POST
+      headers:
+        Authorization: "Bearer {{ st2kv('system.iris_token', default='') }}"
+        Content-Type: application/json
+      body:
+        case_soc_id: "AUTO-{{ ctx().alert_id }}"
+        case_customer: 1
+        case_name: "AUTO-IR: {{ ctx().alert_name }} - {{ ctx().src_ip }}"
+        case_description: |
+          Autonomous SOAR processing for {{ ctx().alert_name }}.
+
+          Source IP: {{ ctx().src_ip }}
+          Country: {{ ctx().country }} ({{ ctx().city }})
+          Org: {{ ctx().org }}
+          Threat Score: {{ ctx().threat_score }}/100
+          Abuse Reports: {{ ctx().abuse_reports }}
+          Failed Login Count: {{ ctx().count }}
+          Response Mode: {{ ctx().response_mode }}
+
+          Response Action:
+          {{ ctx().block_msg }}
+        case_severity_id: 3
+        case_template_id: 1
+      timeout: 10
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - iris_case_id: "{{ result().body.data.case_id | default('not-created') }}"
+        do: notify_team
+      - when: "{{ failed() }}"
+        publish:
+          - iris_case_id: "not-created"
+        do: notify_team
+
+  create_review_case:
+    action: core.http
+    input:
+      url: "{{ env('IRIS_BASE_URL', 'http://iris:8000') }}/manage/cases/add"
+      method: POST
+      headers:
+        Authorization: "Bearer {{ st2kv('system.iris_token', default='') }}"
+        Content-Type: application/json
+      body:
+        case_soc_id: "REVIEW-{{ ctx().alert_id }}"
+        case_customer: 1
+        case_name: "REVIEW: {{ ctx().alert_name }} - {{ ctx().src_ip }}"
+        case_severity_id: 2
+        case_description: |
+          Low-confidence brute-force or unenriched alert.
+          Source IP: {{ ctx().src_ip }}
+          Threat Score: {{ ctx().threat_score }}/100
+          Abuse Reports: {{ ctx().abuse_reports }}
+          Response Mode: {{ ctx().response_mode }}
+      timeout: 10
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - iris_case_id: "{{ result().body.data.case_id | default('not-created') }}"
+        do: notify_team
+      - when: "{{ failed() }}"
+        publish:
+          - iris_case_id: "not-created"
+        do: notify_team
+
+  notify_team:
+    action: core.echo
+    input:
+      message: "SOC response complete for {{ ctx().alert_name }} from {{ ctx().src_ip }} (mode={{ ctx().response_mode }}). IRIS case: {{ ctx().iris_case_id }}"

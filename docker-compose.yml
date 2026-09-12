@@ -1,0 +1,408 @@
+# =============================================================================
+# docker-compose.yml — Autonomous SOC Lab
+# Full open-source stack:
+#   OpenSearch + Dashboards + Vector + ElastAlert2 + StackStorm
+#   + DFIR-IRIS + MISP + Velociraptor + Caldera
+#
+# Usage:
+#   cp .env.example .env      # edit passwords before first run
+#   docker compose pull
+#   docker compose up -d
+#   bash scripts/health-check.sh
+#
+# Default bind addresses are 127.0.0.1. Change *_BIND_ADDRESS in .env to
+# expose services on other interfaces (do this only on an isolated lab
+# network; never expose admin interfaces to the public Internet).
+#
+# Autonomous response safety: see SOC_RESPONSE_MODE. Default is simulation.
+# =============================================================================
+
+networks:
+  soc-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${DOCKER_SUBNET:-172.20.0.0/24}
+
+volumes:
+  opensearch-data:
+  opensearch-dashboards-data:
+  stackstorm-packs:
+  stackstorm-config:
+  postgres-data:
+  misp-data:
+  misp-db:
+  misp-redis-data:
+  velociraptor-data:
+  velociraptor-config:
+  caldera-data:
+
+x-restart: &restart
+  restart: unless-stopped
+
+services:
+  # ---------------------------------------------------------------------------
+  # OpenSearch (single-node, security plugin disabled for the lab)
+  # ---------------------------------------------------------------------------
+  opensearch:
+    image: opensearchproject/opensearch:2.11.0
+    container_name: soc-opensearch
+    environment:
+      - discovery.type=single-node
+      - plugins.security.disabled=true
+      - DISABLE_INSTALL_DEMO_CONFIG=true
+      - OPENSEARCH_JAVA_OPTS=${OPENSEARCH_JAVA_OPTS:--Xms1g -Xmx2g}
+      - bootstrap.memory_lock=true
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+      - ./configs/opensearch/opensearch.yml:/usr/share/opensearch/config/opensearch.yml:ro
+    ports:
+      - "${OPENSEARCH_BIND_ADDRESS:-127.0.0.1}:9200:9200"
+    networks:
+      soc-net:
+        ipv4_address: 172.20.0.10
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:9200/_cluster/health?local=true | grep -q '\"status\":\"\\(green\\|yellow\\)\"'"]
+      interval: 20s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    <<: *restart
+
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:2.11.0
+    container_name: soc-dashboards
+    depends_on:
+      opensearch:
+        condition: service_healthy
+    environment:
+      - OPENSEARCH_HOSTS=http://opensearch:9200
+      - DISABLE_SECURITY_DASHBOARDS_PLUGIN=true
+      - SERVER_HOST=0.0.0.0
+    volumes:
+      - ./configs/opensearch/dashboards.yml:/usr/share/opensearch-dashboards/config/opensearch_dashboards.yml:ro
+      - opensearch-dashboards-data:/usr/share/opensearch-dashboards/data
+    ports:
+      - "${DASHBOARDS_BIND_ADDRESS:-127.0.0.1}:5601:5601"
+    networks:
+      soc-net:
+        ipv4_address: 172.20.0.11
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:5601/api/status | grep -q '\"overall\":{\"level\":\"available\"'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    <<: *restart
+
+  # ---------------------------------------------------------------------------
+  # Vector — log collection, normalization, routing
+  # ---------------------------------------------------------------------------
+  vector:
+    image: timberio/vector:0.35.0-debian
+    container_name: soc-vector
+    depends_on:
+      opensearch:
+        condition: service_healthy
+    environment:
+      - VECTOR_LOG=info
+      - SOC_RESPONSE_MODE=${SOC_RESPONSE_MODE:-simulation}
+    volumes:
+      - ./pipeline/vector.toml:/etc/vector/vector.toml:ro
+      - ./data/sample_logs:/var/log/soc:ro
+    ports:
+      - "${VECTOR_BIND_ADDRESS:-127.0.0.1}:8686:8686"   # vector API (health/metrics)
+    networks:
+      soc-net:
+        ipv4_address: 172.20.0.12
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8686/health | grep -q ok"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    command: ["--config", "/etc/vector/vector.toml"]
+    <<: *restart
+
+  # ---------------------------------------------------------------------------
+  # ElastAlert2 — rule-based alerting on OpenSearch indices
+  # ---------------------------------------------------------------------------
+  elastalert2:
+    image: jertel/elastalert2:2.14.0
+    container_name: soc-elastalert
+    depends_on:
+      opensearch:
+        condition: service_healthy
+    environment:
+      - ELASTICSEARCH_HOST=opensearch
+      - ELASTICSEARCH_PORT=9200
+      - ELASTICSEARCH_USE_SSL=false
+      - ELASTICSEARCH_VERIFY_CERTS=false
+      # Security plugin is disabled in the lab: no username/password required.
+      - ES_USERNAME=
+      - ES_PASSWORD=
+      - RUN_EVERY=30
+      - BUFFER_TIME=15
+    volumes:
+      - ./configs/elastalert/config.yaml:/opt/elastalert/config.yaml:ro
+      - ./detections:/opt/elastalert/rules:ro
+    networks:
+      soc-net:
+        ipv4_address: 172.20.0.13
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /opt/elastalert/config.yaml"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    <<: *restart
+
+  # ---------------------------------------------------------------------------
+  # StackStorm — SOAR workflow engine
+  # NOTE: StackStorm's all-in-one image takes 1-2 minutes to initialize.
+  # On first boot the soc_lab pack must be registered; see scripts/setup-stackstorm.sh.
+  # ---------------------------------------------------------------------------
+  stackstorm:
+    image: stackstorm/stackstorm:3.8.1
+    container_name: soc-stackstorm
+    depends_on:
+      opensearch:
+        condition: service_healthy
+    environment:
+      - ST2_AUTH_USERNAME=${ST2_USER:-st2admin}
+      - ST2_AUTH_PASSWORD=${ST2_PASSWORD:?Set ST2_PASSWORD in .env}
+      - SOC_RESPONSE_MODE=${SOC_RESPONSE_MODE:-simulation}
+      - IRIS_BASE_URL=http://iris:8000
+      - VELOCIRAPTOR_BASE_URL=http://velociraptor:8889
+      - MISP_BASE_URL=http://misp
+      - ABUSEIPDB_API_KEY=${ABUSEIPDB_API_KEY:-}
+      - IPINFO_TOKEN=${IPINFO_TOKEN:-}
+    volumes:
+      - ./soar:/opt/stackstorm/packs/soc_lab:ro
+      - stackstorm-packs:/opt/stackstorm/packs
+      - stackstorm-config:/etc/st2
+    ports:
+      - "${STACKSTORM_BIND_ADDRESS:-127.0.0.1}:9101:9101"   # st2webhook
+      - "${STACKSTORM_API_BIND_ADDRESS:-127.0.0.1}:9100:9100" # st2api
+    networks:
+      soc-net:
+        ipv4_address: 172.20.0.14
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:9101/ 2>&1 | grep -q StackStorm || exit 0"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+    <<: *restart
+
+  # ---------------------------------------------------------------------------
+  # DFIR-IRIS — case management
+  # ---------------------------------------------------------------------------
+  iris:
+    image: dfiriris/iris-webapp:v2.4.5
+    container_name: soc-iris
+    depends_on:
+      iris-db:
+        condition: service_healthy
+    environment:
+      - POSTGRES_SERVER=iris-db
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${POSTGRES_DB:-iris_db}
+      - POSTGRES_USER=${POSTGRES_USER:-iris}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      - IRIS_SECRET_KEY=${IRIS_SECRET_KEY:?Set IRIS_SECRET_KEY in .env}
+      - IRIS_SECURITY_PASSWORD_SALT=${IRIS_SECURITY_PASSWORD_SALT:?Set IRIS_SECURITY_PASSWORD_SALT in .env}
+      - IRIS_ADM_EMAIL=${IRIS_ADM_EMAIL:-admin@soc.lab}
+      - IRIS_ADM_USERNAME=${IRIS_ADM_USERNAME:-admin}
+      - IRIS_ADM_PASSWORD=${IRIS_ADM_PASSWORD:?Set IRIS_ADMIN_PASSWORD in .env}
+    volumes:
+      - iris-data:/home/iris/downloads
+    ports:
+      - "${IRIS_BIND_ADDRESS:-127.0.0.1}:8000:8000"
+    networks:
+      soc-net:
+        ipv4_address: 172.20.0.15
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8000/ 2>&1 | grep -q -i 'iris\\|dfir' || exit 0"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+    <<: *restart
+
+  iris-worker:
+    image: dfiriris/iris-webapp:v2.4.5
+    container_name: soc-iris-worker
+    command: ./entrypoint-worker.sh
+    depends_on:
+      iris-db:
+        condition: service_healthy
+    environment:
+      - POSTGRES_SERVER=iris-db
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${POSTGRES_DB:-iris_db}
+      - POSTGRES_USER=${POSTGRES_USER:-iris}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      - IRIS_SECRET_KEY=${IRIS_SECRET_KEY:?Set IRIS_SECRET_KEY in .env}
+      - IRIS_SECURITY_PASSWORD_SALT=${IRIS_SECURITY_PASSWORD_SALT:?Set IRIS_SECURITY_PASSWORD_SALT in .env}
+    networks:
+      soc-net:
+        ipv4_address: 172.20.0.21
+    restart: unless-stopped
+
+  iris-db:
+    image: postgres:15-alpine
+    container_name: soc-iris-db
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-iris}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      - POSTGRES_DB=${POSTGRES_DB:-iris_db}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      soc-net:
+        ipv4_address: 172.20.0.16
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-iris} -d ${POSTGRES_DB:-iris_db}"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    <<: *restart
+
+  # ---------------------------------------------------------------------------
+  # MISP — threat intelligence (Redis + MySQL + MISP core)
+  # ---------------------------------------------------------------------------
+  misp:
+    image: coolacid/misp-docker:core-latest
+    container_name: soc-misp
+    depends_on:
+      - misp-db
+      - misp-redis
+    environment:
+      - MYSQL_HOST=misp-db
+      - MYSQL_USER=${MYSQL_USER:-misp}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in .env}
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-misp}
+      - MISP_ADMIN_EMAIL=${MISP_ADMIN_EMAIL:-admin@soc.lab}
+      - MISP_ADMIN_PASSPHRASE=${MISP_ADMIN_PASSWORD:?Set MISP_ADMIN_PASSWORD in .env}
+      - MISP_BASEURL=${MISP_BASEURL:-http://localhost:8080}
+      - REDIS_FQDN=misp-redis
+    volumes:
+      - misp-data:/var/www/MISP/app/files
+    ports:
+      - "${MISP_BIND_ADDRESS:-127.0.0.1}:8080:80"
+    networks:
+      soc-net:
+        ipv4_address: 172.20.0.17
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost/ 2>&1 | grep -q -i 'misp' || exit 0"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+    <<: *restart
+
+  misp-db:
+    image: mysql:8.0
+    container_name: soc-misp-db
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env}
+      - MYSQL_USER=${MYSQL_USER:-misp}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in .env}
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-misp}
+    volumes:
+      - misp-db:/var/lib/mysql
+    networks:
+      soc-net:
+        ipv4_address: 172.20.0.18
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 20s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    <<: *restart
+
+  misp-redis:
+    image: redis:7-alpine
+    container_name: soc-misp-redis
+    volumes:
+      - misp-redis-data:/data
+    networks:
+      soc-net:
+        ipv4_address: 172.20.0.22
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    <<: *restart
+
+  # ---------------------------------------------------------------------------
+  # Velociraptor — DFIR collection & (optional) host isolation
+  # Ships a default server.config.yaml from configs/velociraptor/.
+  # ---------------------------------------------------------------------------
+  velociraptor:
+    image: weslambert/velociraptor:latest
+    container_name: soc-velociraptor
+    environment:
+      - VELOCIRAPTOR_USER=${VELOCIRAPTOR_ADMIN_USER:-admin}
+      - VELOCIRAPTOR_PASSWORD=${VELOCIRAPTOR_ADMIN_PASSWORD:?Set VELOCIRAPTOR_ADMIN_PASSWORD in .env}
+    volumes:
+      - velociraptor-data:/opt/velociraptor
+      - velociraptor-config:/etc/velociraptor
+      - ./configs/velociraptor/server.config.yaml:/etc/velociraptor/server.config.yaml:ro
+      - ./velociraptor:/var/velociraptor-artifacts:ro
+    ports:
+      - "${VELOCIRAPTOR_BIND_ADDRESS:-127.0.0.1}:8889:8889"   # GUI
+      - "${VELOCIRAPTOR_AGENT_BIND_ADDRESS:-127.0.0.1}:8001:8000"  # agent endpoint
+    networks:
+      soc-net:
+        ipv4_address: 172.20.0.19
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8889/ 2>&1 | grep -q -i 'velociraptor\\|app' || exit 0"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    <<: *restart
+
+  # ---------------------------------------------------------------------------
+  # MITRE CALDERA — adversary emulation (safe-by-default profile)
+  # Credentials come from env; keys default to empty (Caldera generates on
+  # first launch if left blank). Exposed only on localhost.
+  # ---------------------------------------------------------------------------
+  caldera:
+    image: ghcr.io/mitre/caldera:latest
+    container_name: soc-caldera
+    environment:
+      - CALDERA_CONFIG=/opt/soc-lab/caldera/red_team.yml
+      - CALDERA_HOST=0.0.0.0
+      - CALDERA_PORT=8888
+      - CALDERA_API_KEY_RED=${CALDERA_API_KEY_RED:-}
+      - CALDERA_API_KEY_BLUE=${CALDERA_API_KEY_BLUE:-}
+    volumes:
+      - ./caldera:/opt/soc-lab/caldera:ro
+      - caldera-data:/usr/src/app/data
+    ports:
+      - "${CALDERA_BIND_ADDRESS:-127.0.0.1}:8888:8888"   # GUI
+      - "${CALDERA_BIND_ADDRESS:-127.0.0.1}:7010:7010"   # TCP contact
+      - "${CALDERA_BIND_ADDRESS:-127.0.0.1}:7012:7012"   # UDP contact (removed 7011 — UDP only)
+    networks:
+      soc-net:
+        ipv4_address: 172.20.0.20
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8888/ 2>&1 | grep -q -i 'caldera\\|login' || exit 0"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    <<: *restart

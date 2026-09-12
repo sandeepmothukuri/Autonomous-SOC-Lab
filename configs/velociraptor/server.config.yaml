@@ -1,0 +1,29 @@
+# -----------------------------------------------------------------------------
+# Velociraptor server config (lab default).
+#
+# NOTE: The weslambert/velociraptor image generates its own server config
+# on first boot if none exists. We provide this sane-default config so that
+# the container starts consistently. Credentials are supplied through env
+# (VELOCIRAPTOR_USER / VELOCIRAPTOR_PASSWORD).
+# -----------------------------------------------------------------------------
+Version: 5
+Client:
+  server_urls:
+    - https://velociraptor:8001/
+  require_encrypted_connections: false
+  max_poll: 60
+  use_self_signed_ssl: true
+  pinned_server_name: VelociraptorServer
+Server:
+  bind_address: 0.0.0.0
+  bind_port: 8001
+  GUI:
+    bind_address: 0.0.0.0
+    bind_port: 8889
+  public_path: /opt/velociraptor
+  logging:
+    output_directory: /opt/velociraptor/logs
+  datastore:
+    location: /opt/velociraptor/datastore
+    filestore_directory: /opt/velociraptor/filestore
+  initial_users: []  # created via env by the image

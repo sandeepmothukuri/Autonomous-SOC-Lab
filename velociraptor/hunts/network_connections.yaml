@@ -1,0 +1,8 @@
+# Velociraptor VQL hunt — Established network connections
+name: SOC-Lab.NetworkConnections
+description: Collect current TCP/UDP network connections and their owning process.
+sources:
+  - query: |
+        SELECT Laddr, Raddr, Pid, Name, CommandLine
+        FROM netstat()
+        WHERE Status =~ "ESTAB|LISTEN"

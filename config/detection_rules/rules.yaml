@@ -1,0 +1,36 @@
+# Autonomous-SOC-Lab default detection rules (YAML-format).
+#
+# These are loaded in addition to the built-in Python rules in
+# src/soc/detection/engine.py. YAML rules are simple field-equality /
+# substring / regex matchers. They remain fully deterministic.
+#
+# Author: Sandeep Mothukuri
+
+rules:
+  - rule_id: DET-Y-001
+    rule_name: "Suspicious curl to LOLBAS-style script"
+    severity: medium
+    mitre_techniques: ["T1105"]
+    match:
+      type: substring
+      field: command_line
+      value: "curl http"
+      process_contains: "cmd.exe"
+
+  - rule_id: DET-Y-002
+    rule_name: "Outbound DNS to known DGA domain pattern"
+    severity: medium
+    mitre_techniques: ["T1568"]
+    match:
+      type: substring
+      field: dst_ip
+      value: ".onion"
+
+  - rule_id: DET-Y-003
+    rule_name: "Run key persistence"
+    severity: high
+    mitre_techniques: ["T1547.001"]
+    match:
+      type: substring
+      field: command_line
+      value: "CurrentVersion\\Run"

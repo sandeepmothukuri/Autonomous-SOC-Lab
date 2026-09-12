@@ -1,0 +1,29 @@
+---
+name: respond_brute_force
+pack: soc_lab
+description: Enrich a brute-force source IP, respect SOC_RESPONSE_MODE, and open an IRIS case.
+runner_type: orquesta
+entry_point: workflows/auto_respond.yaml
+enabled: true
+parameters:
+  src_ip:
+    type: string
+    required: true
+  alert_name:
+    type: string
+    default: "Brute Force Attack Detected"
+  alert_id:
+    type: string
+    default: "brute-force-t1110"
+  severity:
+    type: string
+    default: high
+    enum:
+      - info
+      - low
+      - medium
+      - high
+      - critical
+  count:
+    type: integer
+    default: 0

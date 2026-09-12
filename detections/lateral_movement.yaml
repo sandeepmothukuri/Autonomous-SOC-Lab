@@ -1,0 +1,91 @@
+# =============================================================================
+# Detection: Lateral Movement via SMB / RDP / WinRM / WMI / SSH
+#
+# Fires when a single source.ip makes 3+ connections to internal hosts on
+# lateral-movement ports (445 / 3389 / 22 / 135 / 5985 / 5986) within 5 min.
+#
+# Relies on Vector-normalized destination.ip / destination.port /
+# network.direction fields emitted from Sysmon event ID 3 and Zeek conn logs.
+#
+# MITRE ATT&CK:
+#   tactic   : lateral-movement
+#   technique: T1021 Remote Services
+#   sub-tech : T1021.001 RDP, T1021.002 SMB Admin Shares, T1021.004 SSH
+#
+# False-positive considerations:
+#   - Jump hosts, patch-management servers, backup servers commonly initiate
+#     multiple connections. Add allow-listed source.ip filters when deploying
+#     in production.
+# =============================================================================
+
+name: "Lateral Movement Detected"
+type: frequency
+
+index: logs-*
+
+num_events: 3
+timeframe:
+  minutes: 5
+
+query_key: source.ip
+
+filter:
+  - bool:
+      must:
+        - term:
+            network.direction: "internal"
+        - bool:
+            should:
+              - term:
+                  destination.port: 445
+              - term:
+                  destination.port: 3389
+              - term:
+                  destination.port: 22
+              - term:
+                  destination.port: 135
+              - term:
+                  destination.port: 5985
+              - term:
+                  destination.port: 5986
+            minimum_should_match: 1
+
+realert:
+  minutes: 20
+
+alert:
+  - post
+
+http_post_url: "http://stackstorm:9101/v1/webhooks/elastalert"
+http_post_payload:
+  source_ip: "source.ip"
+  destination_ip: "destination.ip"
+  destination_port: "destination.port"
+  count: "num_matches"
+http_post_static_payload:
+  alert_name: "Lateral Movement Detected"
+  alert_id: "lateral-movement-t1021"
+  severity: "high"
+  mitre_tactic: "lateral-movement"
+  mitre_technique: "T1021"
+http_post_headers:
+  Content-Type: "application/json"
+  X-SOC-Source: "elastalert"
+
+alert_text: |
+  LATERAL MOVEMENT DETECTED
+  Source IP:         {source.ip}
+  Destination hits:  {count} internal services (SMB/RDP/SSH/WinRM/WMI)
+  Timeframe:         5 minutes
+  MITRE ATT&CK:      T1021 (Remote Services)
+  Severity:          HIGH
+
+alert_text_type: alert_text_only
+
+include:
+  - source.ip
+  - destination.ip
+  - destination.port
+  - host.name
+
+timestamp_field: "@timestamp"

@@ -1,0 +1,11 @@
+{
+  "description": "Synthetic benign PowerShell Script Block logging — should NOT trigger critical detection",
+  "source": "sysmon",
+  "expected_detection": null,
+  "events": [
+    {
+      "source": "sysmon",
+      "message": "{\"winlog\":{\"event_id\":4104,\"event_data\":{\"SubjectUserName\":\"alice\",\"ScriptBlockText\":\"Write-Host 'hello world'\"}},\"host\":{\"name\":\"wkstn-42.corp.lab\"},\"ComputerName\":\"wkstn-42.corp.lab\"}"
+    }
+  ]
+}

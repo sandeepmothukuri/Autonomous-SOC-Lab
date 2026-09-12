@@ -1,0 +1,141 @@
+name: Autonomous SOC Lab — Validation CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install ShellCheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+      - name: Lint shell scripts
+        run: |
+          mapfile -t files < <(find scripts tests -type f -name '*.sh' -not -path './.git/*')
+          if [ ${#files[@]} -eq 0 ]; then echo 'No shell scripts found'; exit 0; fi
+          shellcheck --exclude=SC1091,SC2034,SC2086,SC2154 --severity=error "${files[@]}"
+
+  python-quality:
+    name: Python Quality & Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[dev] pyyaml pytest
+      - name: pytest
+        run: pytest -q
+
+  yaml-lint:
+    name: YAML Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install yamllint
+        run: pip install yamllint
+      - name: Lint YAML files
+        run: |
+          yamllint -d '{"extends":"relaxed","rules":{"line-length":{"max":200},"truthy":false,"document-start":false}}' detections soar configs caldera pipeline .github
+
+  compose-validation:
+    name: Docker Compose Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Docker Buildx (includes compose)
+        uses: docker/setup-buildx-action@v3
+      - name: Validate Compose
+        run: |
+          set -euo pipefail
+          sed 's/<GENERATE_[^>]*>/ci-placeholder/g' .env.example > .env
+          docker compose config --quiet
+
+  detection-validation:
+    name: Detection / SOAR / Security Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install validation dependencies
+        run: pip install pyyaml pydantic jsonschema pytest
+      - name: Install Python package (src/soc)
+        run: pip install -e .
+      - name: Run all pytest tests
+        run: pytest -q
+      - name: Run static validate_lab.py
+        run: python tests/validate_lab.py
+
+  structure-check:
+    name: Repository Structure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify required files
+        run: |
+          required=(
+            README.md docker-compose.yml .env.example .gitignore LICENSE
+            pipeline/vector.toml
+            detections/brute_force.yaml detections/powershell.yaml
+            detections/privilege_escalation.yaml detections/lateral_movement.yaml
+            soar/pack.yaml soar/rules/elastalert.yaml
+            soar/actions/respond_brute_force.yaml
+            soar/actions/investigate_powershell.yaml
+            soar/actions/isolate_host.yaml
+            soar/actions/create_iris_case.yaml
+            soar/actions/workflows/auto_respond.yaml
+            soar/actions/workflows/investigate_powershell.yaml
+            soar/actions/workflows/isolate_host.yaml
+            soar/actions/workflows/create_iris_case.yaml
+            configs/opensearch/opensearch.yml configs/opensearch/dashboards.yml
+            configs/elastalert/config.yaml caldera/red_team.yml
+            scripts/health-check.sh scripts/test-end-to-end.sh
+            scripts/setup-stackstorm.sh scripts/generate-events.py
+            tests/validate_lab.py tests/fixtures/README.md
+            docs/architecture.md docs/deployment.md docs/security.md
+            docs/detection-engineering.md docs/soar.md
+            docs/threat-intelligence.md docs/incident-response.md
+            docs/mitre-coverage.md docs/testing.md
+            docs/troubleshooting.md docs/validation-matrix.md
+            .github/workflows/validate.yml
+          )
+          fail=0
+          for f in "${required[@]}"; do
+            test -f "$f" && echo "ok $f" || { echo "missing $f"; fail=1; }
+          done
+          exit "$fail"
+
+  secret-scan:
+    name: Secret Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan tracked files
+        shell: bash
+        run: |
+          set -euo pipefail
+          fail=0
+          scan() {
+            local pattern="$1"; local label="$2"
+            if grep -RInE --exclude-dir=.git --exclude=.env.example --exclude-dir=__pycache__ "$pattern" .; then
+              echo "Potential $label found"; fail=1
+            fi
+          }
+          scan 'AKIA[0-9A-Z]{16}' 'AWS access key'
+          scan '-----BEGIN (RSA|EC|DSA|OPENSSH) PRIVATE KEY-----' 'private key'
+          scan 'api_key_(red|blue):[[:space:]]*[A-Za-z0-9._-]{8,}' 'Caldera static API key'
+          scan '(password|passwd|secret|token)[[:space:]]*[:=][[:space:]]*(Soc@|Root@|admin123|password1|changeme|123456)' 'unsafe credential default'
+          exit "$fail"

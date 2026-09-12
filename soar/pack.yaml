@@ -1,0 +1,10 @@
+---
+name: soc_lab
+description: Autonomous SOC Lab response workflows — default mode is simulation.
+version: 0.2.0
+keywords:
+  - soc
+  - incident-response
+  - soar
+  - elastalert
+  - iris

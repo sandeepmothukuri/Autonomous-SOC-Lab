@@ -1,0 +1,216 @@
+{
+  "response_mode": "simulated",
+  "scenarios": [
+    {
+      "scenario_id": "RT-001",
+      "name": "Encoded PowerShell from Office parent",
+      "expected_detections": [
+        "DET-001"
+      ],
+      "fired_detections": [
+        "DET-001"
+      ],
+      "expected_policy_outcome": "recommend",
+      "actual_policy_outcome": "recommend",
+      "status": "in_review",
+      "actions": [
+        {
+          "name": "notify_analyst",
+          "success": true,
+          "simulated": true,
+          "denied": false
+        }
+      ],
+      "ai_confidence": 0.78,
+      "verified": true
+    },
+    {
+      "scenario_id": "RT-002",
+      "name": "Outbound C2 callback to known IOC",
+      "expected_detections": [
+        "DET-002"
+      ],
+      "fired_detections": [
+        "DET-002"
+      ],
+      "expected_policy_outcome": "auto_contain",
+      "actual_policy_outcome": "auto_contain",
+      "status": "contained",
+      "actions": [
+        {
+          "name": "notify_analyst",
+          "success": true,
+          "simulated": true,
+          "denied": false
+        },
+        {
+          "name": "add_ioc_watch",
+          "success": true,
+          "simulated": true,
+          "denied": false
+        },
+        {
+          "name": "add_ioc_watch",
+          "success": true,
+          "simulated": true,
+          "denied": false
+        },
+        {
+          "name": "isolate_host",
+          "success": true,
+          "simulated": true,
+          "denied": false
+        },
+        {
+          "name": "block_ip",
+          "success": true,
+          "simulated": true,
+          "denied": false
+        },
+        {
+          "name": "block_ip",
+          "success": true,
+          "simulated": true,
+          "denied": false
+        }
+      ],
+      "ai_confidence": 0.9,
+      "verified": true
+    },
+    {
+      "scenario_id": "RT-003",
+      "name": "SSH brute force threshold exceeded",
+      "expected_detections": [
+        "DET-003"
+      ],
+      "fired_detections": [
+        "DET-003"
+      ],
+      "expected_policy_outcome": "enrich_and_recommend",
+      "actual_policy_outcome": "enrich_and_recommend",
+      "status": "in_review",
+      "actions": [
+        {
+          "name": "notify_analyst",
+          "success": true,
+          "simulated": true,
+          "denied": false
+        },
+        {
+          "name": "add_ioc_watch",
+          "success": true,
+          "simulated": true,
+          "denied": false
+        }
+      ],
+      "ai_confidence": 0.63,
+      "verified": true
+    },
+    {
+      "scenario_id": "RT-004",
+      "name": "Mimikatz credential dump on DC",
+      "expected_detections": [
+        "DET-005"
+      ],
+      "fired_detections": [
+        "DET-005"
+      ],
+      "expected_policy_outcome": "auto_contain",
+      "actual_policy_outcome": "auto_contain",
+      "status": "contained",
+      "actions": [
+        {
+          "name": "notify_analyst",
+          "success": true,
+          "simulated": true,
+          "denied": false
+        },
+        {
+          "name": "isolate_host",
+          "success": true,
+          "simulated": true,
+          "denied": false
+        }
+      ],
+      "ai_confidence": 0.9,
+      "verified": true
+    },
+    {
+      "scenario_id": "RT-005",
+      "name": "Benign activity",
+      "expected_detections": [],
+      "fired_detections": [],
+      "expected_policy_outcome": "block",
+      "actual_policy_outcome": "n/a",
+      "status": "closed",
+      "actions": [],
+      "ai_confidence": null,
+      "verified": null
+    }
+  ],
+  "aggregate_metrics": {
+    "cases": 5.0,
+    "human_escalation_avg": 0.4,
+    "human_escalation_total": 2.0,
+    "ai_triage_latency_ms_avg": 0.05156199999873934,
+    "ai_triage_latency_ms_total": 0.2578099999936967,
+    "event_count_avg": 1.2,
+    "event_count_total": 6.0,
+    "alert_count_avg": 0.8,
+    "alert_count_total": 4.0,
+    "actions_denied_avg": 0.0,
+    "actions_denied_total": 0.0,
+    "actions_succeeded_avg": 2.2,
+    "actions_succeeded_total": 11.0,
+    "false_positive_flag_avg": 0.0,
+    "false_positive_flag_total": 0.0,
+    "actions_simulated_avg": 2.2,
+    "actions_simulated_total": 11.0,
+    "actions_total_avg": 2.2,
+    "actions_total_total": 11.0,
+    "autonomous_actions_run_avg": 0.8,
+    "autonomous_actions_run_total": 4.0,
+    "actions_failed_avg": 0.0,
+    "actions_failed_total": 0.0,
+    "rollback_available_count_avg": 0.8,
+    "rollback_available_count_total": 4.0,
+    "analyst_time_saved_seconds_avg": 171.0,
+    "analyst_time_saved_seconds_total": 855.0,
+    "detection_latency_ms_avg_avg": 0.009119000014834455,
+    "detection_latency_ms_avg_total": 0.045595000074172276,
+    "human_escalation_rate": 0.4,
+    "automation_success_rate": 1.0,
+    "rollback_rate": 0.36363636363636365,
+    "false_positive_rate": 0.0,
+    "recommendation_accuracy": NaN,
+    "recommendation_feedback_count": 0.0,
+    "analyst_time_saved_total": 855.0
+  },
+  "health_checks": [
+    {
+      "name": "threshold_ordering",
+      "ok": true,
+      "detail": "Cutoffs must satisfy 0 <= low < medium < high <= 1."
+    },
+    {
+      "name": "autonomous_allowlist_subset",
+      "ok": true,
+      "detail": "Autonomous actions must also be on action_allowlist. Offenders: []"
+    },
+    {
+      "name": "deny_list_coverage",
+      "ok": true,
+      "detail": "High-risk actions missing from deny_list: []"
+    },
+    {
+      "name": "detection_rules_completeness",
+      "ok": true,
+      "detail": "Malformed rules: []"
+    },
+    {
+      "name": "real_mode_safeguards",
+      "ok": true,
+      "detail": "Response mode is not REAL; safe by default."
+    }
+  ]
+}

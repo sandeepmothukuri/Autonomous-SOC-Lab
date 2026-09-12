@@ -1,0 +1,86 @@
+# =============================================================================
+# Detection: Privilege Escalation Attempts
+#
+# Combines:
+#   1. SUDO NOPASSWD markers (set in Vector pipeline on auth logs)
+#   2. Service/web-server spawning interactive shells (Sysmon proc_creation
+#      or Linux proxy-logic — here detected via Vector flags on process_start)
+#
+# This is intentionally narrower than the previous version: we do NOT fire on
+# every sudo invocation or every SUID binary. We fire when (a) Vector flagged
+# a sudo_nopasswd_suspected event, or (b) a web-server parent spawns an
+# interactive interpreter.
+#
+# MITRE ATT&CK:
+#   tactic   : privilege-escalation / persistence
+#   technique: T1548 Abuse Elevation Control Mechanism
+#   sub-tech : T1548.003 Sudo and Sudoers Caching (NOPASSWD abuse)
+#
+# False-positive considerations:
+#   - Certain legitimate config-management tools use NOPASSWD. Correlate with
+#     asset criticality in production.
+# =============================================================================
+
+name: "Privilege Escalation Attempt"
+type: any
+
+index: logs-*
+
+filter:
+  - bool:
+      should:
+        - term:
+            event.action: "sudo_nopasswd_suspected"
+        - bool:
+            must:
+              - term:
+                  event.type: "process_start"
+              - bool:
+                  should:
+                    - query_string:
+                        query: "process.parent.name:(apache2 OR nginx OR httpd OR tomcat) AND process.name:(bash OR sh OR zsh OR python OR perl)"
+            minimum_should_match: 1
+      minimum_should_match: 1
+
+realert:
+  minutes: 15
+
+alert:
+  - post
+
+http_post_url: "http://stackstorm:9101/v1/webhooks/elastalert"
+http_post_payload:
+  host_name: "host.name"
+  user_name: "user.name"
+  event_action: "event.action"
+  command_line: "process.command_line"
+http_post_static_payload:
+  alert_name: "Privilege Escalation Attempt"
+  alert_id: "privilege-escalation-t1548"
+  severity: "high"
+  mitre_tactic: "privilege-escalation"
+  mitre_technique: "T1548"
+  mitre_subtechnique: "T1548.003"
+http_post_headers:
+  Content-Type: "application/json"
+  X-SOC-Source: "elastalert"
+
+alert_text: |
+  PRIVILEGE ESCALATION ATTEMPT
+  Host:         {host.name}
+  User:         {user.name}
+  Action:       {event.action}
+  Command line: {process.command_line}
+  MITRE ATT&CK: T1548.003 (Abuse Elevation Control: Sudo NOPASSWD)
+  Severity:     HIGH
+
+alert_text_type: alert_text_only
+
+include:
+  - host.name
+  - user.name
+  - event.action
+  - process.command_line
+  - process.name
+
+timestamp_field: "@timestamp"

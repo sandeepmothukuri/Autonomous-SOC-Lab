@@ -1,0 +1,9 @@
+{
+  "description": "Synthetic sudo NOPASSWD event — T1548.003",
+  "source": "auth",
+  "expected_detection": "Privilege Escalation Attempt",
+  "expected_severity": "high",
+  "events": [
+    {"source": "auth", "message": "Sep 12 13:42:10 web-prod-01 sudo: bob : TTY=pts/1 ; PWD=/home/bob ; USER=root ; COMMAND=NOPASSWD: /usr/local/bin/backdoor.sh", "file": "auth.log"}
+  ]
+}

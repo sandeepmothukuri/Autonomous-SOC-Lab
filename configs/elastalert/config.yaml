@@ -1,0 +1,35 @@
+# -----------------------------------------------------------------------------
+# ElastAlert2 — Autonomous SOC Lab
+# Security plugin on OpenSearch is disabled in this lab build, so we do NOT
+# set es_username / es_password.
+# -----------------------------------------------------------------------------
+
+es_host: opensearch
+es_port: 9200
+use_ssl: false
+verify_certs: false
+# es_username/es_password are intentionally OMITTED — no auth in the lab.
+
+writeback_index: elastalert_status
+writeback_alias: elastalert_alerts
+rules_folder: /opt/elastalert/rules
+
+run_every:
+  seconds: 30
+buffer_time:
+  minutes: 15
+alert_time_limit:
+  hours: 2
+
+log_level: INFO
+log_file: /var/log/elastalert/elastalert.log
+disable_rules_on_error: false
+max_scrolling_count: 990
+alert_subject_prefix: "[SOC ALERT]"
+old_query_limit:
+  weeks: 1
+use_local_time: true
+add_metadata_alert: true
+
+# Treat missing fields as "not present" rather than blowing up.
+alert_text_args: []

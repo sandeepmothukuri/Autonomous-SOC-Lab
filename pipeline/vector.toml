@@ -1,0 +1,334 @@
+# =============================================================================
+# vector.toml — SOC log pipeline
+#
+# Collects synthetic and real lab logs, normalizes them into an ECS-like
+# schema, and ships to OpenSearch.
+#
+# Normalized fields (ECS-compatible) set by transforms:
+#   @timestamp             ingestion timestamp
+#   event.kind             "event" | "alert" | "enrichment"
+#   event.category         "authentication" | "process" | "network" | "file"
+#   event.type             "failed_login" | "process_start" | "connection" | ...
+#   event.action           e.g. "ssh_login_failed", "powershell_encoded"
+#   event.severity         "info" | "low" | "medium" | "high" | "critical"
+#   source.ip              attacking/connecting IP
+#   source.port            source port (if known)
+#   destination.ip         target IP
+#   destination.port       target port
+#   host.name              target hostname
+#   user.name              account name
+#   process.name           short process name
+#   process.command_line   full command line
+#   network.direction      "internal" | "external" | "unknown"
+#
+# Critical events are routed to `alerts-critical-*` indices. A critical
+# event is one that has already been assigned severity "critical" by a
+# VRL rule in this pipeline OR by Sysmon EventID 4104 with encoded
+# PowerShell. We DO NOT copy everything into the critical index.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Sources
+# -----------------------------------------------------------------------------
+
+[sources.sample_auth]
+type = "file"
+include = ["/var/log/soc/auth.log"]
+read_from = "beginning"
+fingerprint.strategy = "device_and_inode"
+
+[sources.sample_sysmon]
+type = "file"
+include = ["/var/log/soc/sysmon.json"]
+read_from = "beginning"
+fingerprint.strategy = "device_and_inode"
+
+[sources.sample_zeek]
+type = "file"
+include = ["/var/log/soc/zeek_conn.log"]
+read_from = "beginning"
+fingerprint.strategy = "device_and_inode"
+
+# In production you would add real sources here, e.g.:
+# [sources.host_syslog]
+# type = "syslog"
+# address = "0.0.0.0:5140"
+# mode = "udp"
+
+# -----------------------------------------------------------------------------
+# Transforms — auth (Linux SSH / sudo)
+# -----------------------------------------------------------------------------
+
+[transforms.parse_auth]
+type = "remap"
+inputs = ["sample_auth"]
+source = '''
+.ingest_timestamp = now()
+.source = "auth"
+.event.kind = "event"
+.event.category = "authentication"
+msg = string!(.message)
+
+# SSH failed login — e.g. "Failed password for root from 203.0.113.42 port 22 ssh2"
+if match(msg, r'[Ff]ailed password') {
+  .event.type = "failed_login"
+  .event.action = "ssh_login_failed"
+  .event.severity = "medium"
+  m = parse_regex(msg, r'(?:for invalid user |for )(?P<user>\S+) from (?P<src_ip>\S+)(?: port (?P<sp>\d+))?') ?? {}
+  if exists(m.user) { .user.name = m.user }
+  if exists(m.src_ip) { .source.ip = m.src_ip }
+  .host.name = get_hostname!(.file ?? "unknown")
+  .destination.ip = "127.0.0.1"
+  .destination.port = 22
+  .network.direction = "external"
+} else if match(msg, r'[Aa]ccepted password') {
+  .event.type = "successful_login"
+  .event.action = "ssh_login_success"
+  .event.severity = "info"
+  m = parse_regex(msg, r'for (?P<user>\S+) from (?P<src_ip>\S+)') ?? {}
+  if exists(m.user) { .user.name = m.user }
+  if exists(m.src_ip) { .source.ip = m.src_ip }
+  .host.name = get_hostname!(.file ?? "unknown")
+  .destination.ip = "127.0.0.1"
+  .destination.port = 22
+  .network.direction = "external"
+} else if match(msg, r'sudo:') {
+  .event.category = "process"
+  .event.type = "privilege_use"
+  .event.action = "sudo_invocation"
+  .event.severity = "low"
+  .host.name = get_hostname!(.file ?? "unknown")
+  # SUDO_NOPASSWD escalation marker
+  if match(msg, r'NOPASSWD') {
+    .event.severity = "high"
+    .event.action = "sudo_nopasswd_suspected"
+  }
+} else {
+  .event.type = "info"
+  .event.action = "auth_other"
+  .event.severity = "info"
+}
+'''
+
+# -----------------------------------------------------------------------------
+# Transforms — Sysmon / Windows Event Logs (JSON)
+# -----------------------------------------------------------------------------
+
+[transforms.parse_sysmon]
+type = "remap"
+inputs = ["sample_sysmon"]
+source = '''
+# Events are line-delimited JSON objects; .message contains the raw line.
+parsed, err = parse_json(.message)
+if err == null {
+  . = merge(., parsed)
+}
+.ingest_timestamp = now()
+.source = "sysmon"
+.event.kind = "event"
+
+# Defaults
+if !exists(.host.name) { .host.name = .ComputerName ?? "unknown" }
+
+# Event ID 4625 / Sysmon-friendly failed logon
+if (.winlog.event_id ?? .EventID ?? 0) == 4625 {
+  .event.category = "authentication"
+  .event.type = "failed_login"
+  .event.action = "windows_failed_login"
+  .event.severity = "medium"
+  .user.name = .winlog.event_data.TargetUserName ?? .EventData?.TargetUserName ?? "unknown"
+  .source.ip = .winlog.event_data.IpAddress ?? .EventData?.IpAddress ?? null
+  .destination.ip = "127.0.0.1"
+  .network.direction = "external"
+}
+
+# Event ID 4688 / Sysmon 1 — process creation
+if (.winlog.event_id ?? .EventID ?? 0) == 4688 {
+  .event.category = "process"
+  .event.type = "process_start"
+  .event.action = "process_creation"
+  .event.severity = "low"
+  .process.name = .winlog.event_data.NewProcessName ?? .EventData?.NewProcessName ?? null
+  .process.command_line = .winlog.event_data.CommandLine ?? .EventData?.CommandLine ?? null
+  .user.name = .winlog.event_data.SubjectUserName ?? .EventData?.SubjectUserName ?? null
+}
+
+# Event ID 4104 (PowerShell Script Block logging) — this is our high-value signal
+if (.winlog.event_id ?? .EventID ?? 0) == 4104 {
+  .event.category = "process"
+  .event.type = "powershell_execution"
+  .event.action = "powershell_scriptblock"
+  .event.severity = "medium"
+  .process.name = "powershell.exe"
+  .process.command_line = .powershell.script_block_text ?? .winlog.event_data.ScriptBlockText ?? ""
+  .user.name = .winlog.event_data.UserId ?? .EventData?.UserId ?? null
+
+  script = downcase(string!(.process.command_line))
+  if includes(script, "-enc") || includes(script, "-encodedcommand") {
+    .event.severity = "critical"
+    .alert.rule = "powershell_encoded_command"
+    .mitre.technique = "T1059.001"
+    .mitre.tactic = "execution"
+  } else if includes(script, "downloadstring") || includes(script, "invoke-expression") || includes(script, " iex") || includes(script, "webclient") {
+    .event.severity = "high"
+    .alert.rule = "powershell_download_cradle"
+    .mitre.technique = "T1059.001"
+    .mitre.tactic = "execution"
+  } else if includes(script, "bypass") && includes(script, "executionpolicy") {
+    .event.severity = "high"
+    .alert.rule = "powershell_executionpolicy_bypass"
+    .mitre.technique = "T1059.001"
+    .mitre.tactic = "defense-evasion"
+  }
+}
+
+# Event ID 3 / network connection (Sysmon)
+if (.winlog.event_id ?? .EventID ?? 0) == 3 {
+  .event.category = "network"
+  .event.type = "connection"
+  .event.action = "network_connection"
+  .event.severity = "low"
+  .process.name = .winlog.event_data.Image ?? null
+  .source.ip = .host.ip ?? "127.0.0.1"
+  .destination.ip = .winlog.event_data.DestinationIp ?? .EventData?.DestinationIp ?? null
+  .destination.port = .winlog.event_data.DestinationPort ?? .EventData?.DestinationPort ?? null
+  # Heuristic: internal vs external
+  if exists(.destination.ip) && match!(string!(.destination.ip), r'^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)') {
+    .network.direction = "internal"
+  } else if exists(.destination.ip) {
+    .network.direction = "external"
+  }
+  # Lateral movement heuristic: SMB/RDP/WinRM/WMI from a source to an internal dst
+  if .network.direction == "internal"
+    && (to_int!(.destination.port ?? 0) == 445
+        || to_int!(.destination.port ?? 0) == 3389
+        || to_int!(.destination.port ?? 0) == 5985
+        || to_int!(.destination.port ?? 0) == 5986
+        || to_int!(.destination.port ?? 0) == 135) {
+    .event.severity = "high"
+    .alert.rule = "lateral_movement_suspected"
+    .mitre.technique = "T1021"
+    .mitre.tactic = "lateral-movement"
+  }
+}
+'''
+
+# -----------------------------------------------------------------------------
+# Transforms — Zeek conn.log (TSV, simplified)
+# -----------------------------------------------------------------------------
+
+[transforms.parse_zeek]
+type = "remap"
+inputs = ["sample_zeek"]
+source = '''
+.ingest_timestamp = now()
+.source = "zeek"
+.event.kind = "event"
+.event.category = "network"
+.event.type = "connection"
+.event.action = "network_flow"
+.event.severity = "info"
+
+# Zeek TSV fields (tab-separated, ignore #-prefixed header lines)
+line = string!(.message)
+if starts_with(line, "#") {
+  abort  # drop header lines
+}
+parts = split(line, "\t")
+if length(parts) >= 6 {
+  .source.ip = parts[2]
+  .source.port = to_int(parts[3] ?? "0") ?? 0
+  .destination.ip = parts[4]
+  .destination.port = to_int(parts[5] ?? "0") ?? 0
+  .host.name = "zeek-sensor"
+}
+if exists(.destination.ip) && match!(string!(.destination.ip), r'^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)') {
+  .network.direction = "internal"
+} else if exists(.destination.ip) {
+  .network.direction = "external"
+}
+# Flag RDP/SSH/SMB outbound to external as potential lateral-movement signal
+if .network.direction == "internal" && (to_int!(.destination.port ?? 0) == 445
+    || to_int!(.destination.port ?? 0) == 3389
+    || to_int!(.destination.port ?? 0) == 22
+    || to_int!(.destination.port ?? 0) == 5985
+    || to_int!(.destination.port ?? 0) == 5986) {
+  .event.severity = "high"
+  .alert.rule = "lateral_movement_suspected"
+  .mitre.technique = "T1021"
+  .mitre.tactic = "lateral-movement"
+}
+'''
+
+# -----------------------------------------------------------------------------
+# Shared: enforce defaults + lab metadata
+# -----------------------------------------------------------------------------
+
+[transforms.finalize]
+type = "remap"
+inputs = ["parse_auth", "parse_sysmon", "parse_zeek"]
+source = '''
+.lab.version = "1.2"
+.lab.environment = "soc-lab"
+if !exists(.event.severity) { .event.severity = "info" }
+if !exists(.event.type) { .event.type = "unknown" }
+if !exists(.event.action) { .event.action = "unspecified" }
+if !exists(.network.direction) { .network.direction = "unknown" }
+.@timestamp = .ingest_timestamp
+del(.ingest_timestamp)
+if is_string(.message) && length(string!(.message)) > 16384 {
+  .message = slice!(string!(.message), 0, 16384)
+}
+'''
+
+# -----------------------------------------------------------------------------
+# Filter: only CRITICAL severity events → critical index
+# -----------------------------------------------------------------------------
+
+[transforms.only_critical]
+type = "filter"
+inputs = ["finalize"]
+condition = '.event.severity == "critical" || exists(.alert.rule)'
+
+# -----------------------------------------------------------------------------
+# Sinks
+# -----------------------------------------------------------------------------
+
+[sinks.opensearch_all]
+type = "elasticsearch"
+inputs = ["finalize"]
+endpoints = ["http://opensearch:9200"]
+index = "logs-%Y.%m.%d"
+compression = "gzip"
+bulk.action = "create"
+batch.max_bytes = 5242880
+batch.timeout_secs = 5
+request.timeout_secs = 10
+
+  [sinks.opensearch_all.tls]
+  verify_certificate = false
+  enabled = false
+
+[sinks.opensearch_critical]
+type = "elasticsearch"
+inputs = ["only_critical"]
+endpoints = ["http://opensearch:9200"]
+index = "alerts-critical-%Y.%m.%d"
+compression = "gzip"
+bulk.action = "create"
+batch.max_bytes = 1048576
+batch.timeout_secs = 2
+request.timeout_secs = 10
+
+  [sinks.opensearch_critical.tls]
+  verify_certificate = false
+  enabled = false
+
+  [sinks.opensearch_critical.request]
+  headers.X-SOC-Priority = "critical"
+
+[sinks.console_debug]
+type = "console"
+inputs = ["only_critical"]
+target = "stdout"
+encoding.codec = "json"

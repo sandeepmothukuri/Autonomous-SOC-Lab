@@ -1,0 +1,9 @@
+{
+  "description": "Synthetic normal SSH logins — should NOT trigger brute-force detection",
+  "source": "auth",
+  "expected_detection": null,
+  "events": [
+    {"source": "auth", "message": "Sep 12 13:41:02 web-prod-01 sshd[2055]: Accepted password for alice from 10.0.0.14 port 52100 ssh2", "file": "auth.log"},
+    {"source": "auth", "message": "Sep 12 13:41:03 web-prod-01 sshd[2056]: Accepted password for bob from 10.0.0.15 port 52101 ssh2", "file": "auth.log"}
+  ]
+}

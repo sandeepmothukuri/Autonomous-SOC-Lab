@@ -1,0 +1,48 @@
+# Autonomous-SOC-Lab default configuration.
+# Author: Sandeep Mothukuri
+#
+# Conservative, research-safe defaults. Override per deployment.
+
+siem_index: "soc-cases"
+audit_log_path: "data/audit.log"
+
+thresholds:
+  low_cutoff: 0.40
+  medium_cutoff: 0.70
+  high_cutoff: 0.90
+  auto_contain_min_confidence: 0.90
+  auto_contain_min_severity: "high"
+
+ai:
+  enabled: true
+  provider: "mock"                 # replace with "openai", "anthropic", etc.
+  model_id: "mock-grounded-v0"
+  request_timeout_s: 15
+  max_retries: 2
+  require_evidence_grounding: true
+  reject_on_unsupported_claim: true
+
+soar:
+  # response_mode: audit_only -> no response actions at all
+  #                simulated  -> actions run in sandbox; real systems untouched
+  #                real       -> real actions allowed (subject to allowlists / approvals)
+  response_mode: "simulated"
+  action_allowlist:
+    - block_ip
+    - isolate_host
+    - disable_user
+    - quarantine_file
+    - add_ioc_watch
+    - notify_analyst
+  autonomous_allowlist:
+    - block_ip
+    - isolate_host
+  deny_list:
+    - wipe_host
+    - delete_file
+    - execute_shell
+    - run_arbitrary_command
+    - reboot_host_without_approval
+  dry_run_by_default: true
+  default_action_timeout_s: 30
+  max_action_retries: 2

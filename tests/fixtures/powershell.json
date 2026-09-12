@@ -1,0 +1,12 @@
+{
+  "description": "Synthetic PowerShell encoded-command event (Sysmon EventID 4104) — T1059.001",
+  "source": "sysmon",
+  "expected_detection": "Suspicious PowerShell Execution",
+  "expected_severity": "critical",
+  "events": [
+    {
+      "source": "sysmon",
+      "message": "{\"winlog\":{\"event_id\":4104,\"event_data\":{\"SubjectUserName\":\"alice\",\"ScriptBlockText\":\"powershell.exe -NoProfile -ExecutionPolicy Bypass -EncodedCommand JABjAGwAaQBlAG4AdAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0AA==\"}},\"host\":{\"name\":\"wkstn-42.corp.lab\"},\"ComputerName\":\"wkstn-42.corp.lab\"}"
+    }
+  ]
+}

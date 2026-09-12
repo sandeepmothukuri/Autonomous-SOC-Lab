@@ -1,0 +1,18 @@
+# Velociraptor VQL hunt — Suspicious PowerShell indicators
+# Safe, read-only artifact collection. Run manually from the Velociraptor
+# GUI or API; no automated execution in the default stack.
+name: SOC-Lab.SuspiciousPowerShell
+description: Collect PowerShell console history and process command lines for
+  suspicious flags (EncodedCommand, IEX, DownloadString, bypass).
+parameters:
+  - name: patterns
+    default: "-Enc|-EncodedCommand|IEX|Invoke-Expression|DownloadString|-ExecutionPolicy[ ]*Bypass"
+    type: regex
+sources:
+  - query: |
+        LET files = SELECT FullPath FROM glob(
+           globs='C:/Users/*/AppData/Roaming/Microsoft/Windows/PowerShell/PSReadLine/ConsoleHost_history.txt')
+        SELECT FullPath,
+               read_file(filename=FullPath) AS Content
+        FROM files
+        WHERE Content =~ patterns

@@ -1,0 +1,24 @@
+---
+name: create_iris_case
+pack: soc_lab
+description: Create a generic IRIS incident case from an ElastAlert2 alert.
+runner_type: orquesta
+entry_point: workflows/create_iris_case.yaml
+enabled: true
+parameters:
+  alert_name:
+    type: string
+    required: true
+  host:
+    type: string
+    default: unknown
+  user:
+    type: string
+    default: unknown
+  severity:
+    type: string
+    default: medium
+    enum: [info, low, medium, high, critical]
+  description:
+    type: string
+    default: ""

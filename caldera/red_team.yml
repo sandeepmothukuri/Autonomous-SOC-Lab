@@ -1,0 +1,109 @@
+# MITRE Caldera — Autonomous SOC Lab
+# Safe-by-default adversary emulation profiles.
+#
+# IMPORTANT:
+# - This file is lab content, not a production security control.
+# - CALDERA credentials are supplied through the CALDERA_API_KEY_RED and
+#   CALDERA_API_KEY_BLUE environment variables when the deployment supports it.
+# - Destructive impact actions are intentionally excluded from the default
+#   validation profile.
+
+adversaries:
+  - name: "APT29 Detection Validation"
+    description: "Non-destructive APT29-inspired TTP sequence for detection validation"
+    safe: true
+    atomic_ordering:
+      - name: "PowerShell Encoded Command"
+        tactic: execution
+        technique: T1059.001
+        command: |
+          powershell.exe -EncodedCommand JABjAGwAaQBlAG4AdAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0AA==
+      - name: "Scheduled Task Discovery"
+        tactic: discovery
+        technique: T1053.005
+        command: |
+          schtasks /query /fo LIST /v
+      - name: "Process Discovery"
+        tactic: discovery
+        technique: T1057
+        command: |
+          tasklist /fo CSV
+      - name: "System Information Discovery"
+        tactic: discovery
+        technique: T1082
+        command: |
+          systeminfo
+      - name: "Network Service Discovery"
+        tactic: discovery
+        technique: T1046
+        command: |
+          powershell.exe -NoProfile -Command "Get-NetTCPConnection | Select-Object LocalAddress,LocalPort,RemoteAddress,RemotePort,State"
+
+  - name: "Ransomware Pre-Stage Detection Validation"
+    description: "Non-destructive discovery and lateral-movement telemetry"
+    safe: true
+    atomic_ordering:
+      - name: "Network Discovery"
+        tactic: discovery
+        technique: T1046
+        command: |
+          nmap -sS -p 445,3389,22 --open 10.0.0.0/24 -oN /tmp/soc-lab-scan.txt
+      - name: "SMB Share Discovery"
+        tactic: discovery
+        technique: T1135
+        command: |
+          net view \\#{target_ip}
+      - name: "Remote Services Discovery"
+        tactic: discovery
+        technique: T1021
+        command: |
+          powershell.exe -NoProfile -Command "Test-NetConnection #{target_ip} -Port 445"
+
+# Credentials are intentionally placeholders. Configure them outside Git,
+# using CALDERA's own configuration/secret mechanism for your deployment.
+caldera:
+  host: 0.0.0.0
+  port: 8888
+  api_key_red: "${CALDERA_API_KEY_RED:-}"
+  api_key_blue: "${CALDERA_API_KEY_BLUE:-}"
+  plugins:
+    - sandcat
+    - stockpile
+    - compass
+    - manx
+  agents:
+    sleep_min: 15
+    sleep_max: 60
+    implant_name: sandcat
+  app.contact.http: http://caldera:8888
+  app.contact.tcp: caldera:7010
+
+exercises:
+  - id: EX-001
+    name: "Detect Brute Force + Review"
+    description: "Generate synthetic failed-login telemetry and validate T1110 without modifying host firewall state."
+    safe: true
+    expected_detections:
+      - rule: brute_force.yaml
+      - iris_case: true
+      - response: review_or_simulated_block
+
+  - id: EX-002
+    name: "PowerShell Encoded Command Detection"
+    description: "Use synthetic Script Block telemetry to validate T1059.001 and IRIS case creation."
+    safe: true
+    expected_detections:
+      - rule: powershell.yaml
+      - iris_case: true
+
+  - id: EX-003
+    name: "Lateral Movement Telemetry"
+    description: "Generate synthetic SMB/RDP/SSH connection telemetry and validate T1021."
+    safe: true
+    expected_detections:
+      - rule: lateral_movement.yaml
+      - iris_case: true
+
+# Destructive actions such as clearing event logs, dumping LSASS, deleting
+# shadow copies, or disabling recovery are deliberately not part of the
+# default repository profile. Add them only in an isolated exercise branch.

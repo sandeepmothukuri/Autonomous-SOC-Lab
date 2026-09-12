@@ -1,0 +1,14 @@
+{
+  "description": "Synthetic SSH brute-force events (5 failures) — T1110.001",
+  "source": "auth",
+  "expected_detection": "Brute Force Attack Detected",
+  "expected_severity": "high",
+  "events": [
+    {"source": "auth", "message": "Sep 12 13:40:01 web-prod-01 sshd[2001]: Failed password for root from 203.0.113.47 port 51220 ssh2", "file": "auth.log"},
+    {"source": "auth", "message": "Sep 12 13:40:05 web-prod-01 sshd[2002]: Failed password for root from 203.0.113.47 port 51222 ssh2", "file": "auth.log"},
+    {"source": "auth", "message": "Sep 12 13:40:09 web-prod-01 sshd[2003]: Failed password for root from 203.0.113.47 port 51224 ssh2", "file": "auth.log"},
+    {"source": "auth", "message": "Sep 12 13:40:13 web-prod-01 sshd[2004]: Failed password for invalid user admin from 203.0.113.47 port 51226 ssh2", "file": "auth.log"},
+    {"source": "auth", "message": "Sep 12 13:40:17 web-prod-01 sshd[2005]: Failed password for root from 203.0.113.47 port 51228 ssh2"},
+    {"source": "auth", "message": "Sep 12 13:40:21 web-prod-01 sshd[2006]: Failed password for root from 203.0.113.47 port 51230 ssh2", "file": "auth.log"}
+  ]
+}

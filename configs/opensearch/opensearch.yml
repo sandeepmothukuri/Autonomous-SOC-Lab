@@ -1,0 +1,51 @@
+# -----------------------------------------------------------------------------
+# OpenSearch configuration — Autonomous SOC Lab
+#
+# Security plugin is DISABLED in this lab build (single-node, isolated lab
+# network, management ports bound to 127.0.0.1). Do NOT expose this node to
+# untrusted networks without re-enabling the security plugin.
+# -----------------------------------------------------------------------------
+
+cluster.name: soc-lab-cluster
+node.name: soc-node-01
+
+# Network
+network.host: 0.0.0.0
+http.port: 9200
+transport.port: 9300
+
+# Single-node discovery
+discovery.type: single-node
+
+# Security — off for lab use
+plugins.security.disabled: true
+
+# Memory / indexing
+bootstrap.memory_lock: true
+indices.memory.index_buffer_size: 20%
+indices.queries.cache.size: 15%
+
+# Safety
+action.auto_create_index: true
+action.destructive_requires_name: true
+
+# Logging
+logger.level: INFO
+
+# Paths (match the official Docker image layout)
+path.data: /usr/share/opensearch/data
+path.logs: /usr/share/opensearch/logs
+
+# Single-node shard defaults (can be overridden per index template)
+index.number_of_shards: 1
+index.number_of_replicas: 0
+
+# Thread pools for SOC ingest workload
+thread_pool.write.queue_size: 500
+thread_pool.search.queue_size: 500
+
+# HTTP
+http.max_content_length: 500mb
+http.cors.enabled: true
+http.cors.allow-origin: "*"
+http.cors.allow-headers: "X-Requested-With,Content-Type,Content-Length,Authorization"

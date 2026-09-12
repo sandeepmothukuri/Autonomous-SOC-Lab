@@ -1,0 +1,53 @@
+---
+version: 1.0
+description: Generic IRIS case creation for alerts that do not trigger an
+  automated response block.
+
+input:
+  - alert_name
+  - host
+  - user
+  - severity
+  - description
+
+vars:
+  - iris_case_id: ""
+  - response_mode: "{{ env('SOC_RESPONSE_MODE', 'simulation') }}"
+
+tasks:
+  create_case:
+    action: core.http
+    input:
+      url: "{{ env('IRIS_BASE_URL', 'http://iris:8000') }}/manage/cases/add"
+      method: POST
+      headers:
+        Authorization: "Bearer {{ st2kv('system.iris_token', default='') }}"
+        Content-Type: application/json
+      body:
+        case_soc_id: "AUTO-GENERIC-{{ ctx().host }}"
+        case_customer: 1
+        case_name: "AUTO-IR: {{ ctx().alert_name }} - {{ ctx().host }}"
+        case_description: |
+          Alert: {{ ctx().alert_name }}
+          Host: {{ ctx().host }}
+          User: {{ ctx().user }}
+          Severity: {{ ctx().severity }}
+          Response Mode: {{ ctx().response_mode }}
+          Details: {{ ctx().description }}
+        case_severity_id: 3
+        case_template_id: 1
+      timeout: 10
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - iris_case_id: "{{ result().body.data.case_id | default('not-created') }}"
+        do: notify_team
+      - when: "{{ failed() }}"
+        publish:
+          - iris_case_id: "not-created"
+        do: notify_team
+
+  notify_team:
+    action: core.echo
+    input:
+      message: "Case {{ ctx().alert_name }} created for {{ ctx().host }} (mode={{ ctx().response_mode }}). IRIS case: {{ ctx().iris_case_id }}"

@@ -1,0 +1,81 @@
+# =============================================================================
+# Detection: SSH / Windows Brute-force Attack
+#
+# Fires on 5+ failed_login events within 2 minutes grouped by source.ip.
+# Relies on Vector-normalized fields (source.ip, host.name, user.name).
+#
+# MITRE ATT&CK:
+#   tactic   : credential-access
+#   technique: T1110 Brute Force
+#   sub-tech : T1110.001 Password Guessing
+#
+# False-positive considerations:
+#   - Legitimate misconfigured scanners (e.g., vulnerability management tools)
+#     can produce multiple failures; tune query_key with a whitelist if needed.
+# =============================================================================
+
+name: "Brute Force Attack Detected"
+type: frequency
+
+index: logs-*
+
+num_events: 5
+timeframe:
+  minutes: 2
+
+query_key: source.ip
+
+filter:
+  - bool:
+      must:
+        - term:
+            event.type: "failed_login"
+
+realert:
+  minutes: 10
+
+alert:
+  - post
+
+http_post_url: "http://stackstorm:9101/v1/webhooks/elastalert"
+http_post_payload:
+  source_ip: "source.ip"
+  host_name: "host.name"
+  user_name: "user.name"
+  count: "num_matches"
+http_post_static_payload:
+  alert_name: "Brute Force Attack Detected"
+  alert_id: "brute-force-t1110"
+  severity: "high"
+  mitre_tactic: "credential-access"
+  mitre_technique: "T1110"
+  mitre_subtechnique: "T1110.001"
+http_post_headers:
+  Content-Type: "application/json"
+  X-SOC-Source: "elastalert"
+
+alert_text: |
+  BRUTE FORCE ATTACK DETECTED
+  Source IP:     {source.ip}
+  Target Host:   {host.name}
+  User:          {user.name}
+  Attempts:      {count} failed logins in 2 minutes
+  First seen:    {first_hit_time}
+  Last seen:     {last_hit_time}
+  MITRE ATT&CK:  T1110.001 (Brute Force: Password Guessing)
+  Severity:      HIGH
+
+alert_text_type: alert_text_only
+
+include:
+  - source.ip
+  - host.name
+  - user.name
+  - event.type
+
+timestamp_field: "@timestamp"
+
+# Response recommendation (consumed by SOAR, not executed by ElastAlert):
+#   enrichment -> SOC_RESPONSE_MODE=simulation logs block decision;
+#                 mode=approval requires analyst sign-off; mode=active
+#                 performs firewall block.

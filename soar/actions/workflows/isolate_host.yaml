@@ -1,0 +1,86 @@
+---
+version: 1.0
+description: |
+  Request host isolation through Velociraptor and create an IRIS case.
+  Respects SOC_RESPONSE_MODE: simulation logs the action, approval posts a
+  case flagged for analyst approval, active calls the Velociraptor API.
+
+input:
+  - src_ip
+  - destination_ip
+  - destination_port
+  - alert_name
+  - severity
+
+vars:
+  - isolation_flow: ""
+  - iris_case_id: ""
+  - response_mode: "{{ env('SOC_RESPONSE_MODE', 'simulation') }}"
+  - isolation_msg: ""
+
+tasks:
+  request_isolation:
+    action: core.http
+    input:
+      url: "{{ env('VELOCIRAPTOR_BASE_URL', 'http://velociraptor:8889') }}/api/v1/flows"
+      method: POST
+      headers:
+        Authorization: "Bearer {{ st2kv('system.velociraptor_token', default='') }}"
+        Content-Type: application/json
+      body:
+        flow_request:
+          artifacts:
+            - Windows.Remediation.Quarantine
+          parameters:
+            source_ip: "{{ ctx().src_ip }}"
+            mode: "{{ ctx().response_mode }}"
+      timeout: 10
+    next:
+      - when: "{{ succeeded() and ctx().response_mode == 'active' }}"
+        publish:
+          - isolation_flow: "{{ result().body.flow_id | default('unknown') }}"
+          - isolation_msg: "Velociraptor isolation flow {{ result().body.flow_id | default('unknown') }} initiated."
+        do: create_case
+      - when: "{{ failed() or ctx().response_mode != 'active' }}"
+        publish:
+          - isolation_flow: "simulated"
+          - isolation_msg: "SIMULATION MODE ({{ ctx().response_mode }}): isolation would be requested; no action taken."
+        do: create_case
+
+  create_case:
+    action: core.http
+    input:
+      url: "{{ env('IRIS_BASE_URL', 'http://iris:8000') }}/manage/cases/add"
+      method: POST
+      headers:
+        Authorization: "Bearer {{ st2kv('system.iris_token', default='') }}"
+        Content-Type: application/json
+      body:
+        case_soc_id: "AUTO-LATERAL-{{ ctx().src_ip }}"
+        case_customer: 1
+        case_name: "AUTO-IR: {{ ctx().alert_name }} - {{ ctx().src_ip }}"
+        case_description: |
+          Lateral movement alert detected by ElastAlert2.
+          Source IP: {{ ctx().src_ip }}
+          Destination IP: {{ ctx().destination_ip }}
+          Destination Port: {{ ctx().destination_port }}
+          Severity: {{ ctx().severity }}
+          Response Mode: {{ ctx().response_mode }}
+          {{ ctx().isolation_msg }}
+        case_severity_id: 4
+        case_template_id: 1
+      timeout: 10
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - iris_case_id: "{{ result().body.data.case_id | default('not-created') }}"
+        do: notify_team
+      - when: "{{ failed() }}"
+        publish:
+          - iris_case_id: "not-created"
+        do: notify_team
+
+  notify_team:
+    action: core.echo
+    input:
+      message: "Lateral-movement response for {{ ctx().src_ip }} (mode={{ ctx().response_mode }}). IRIS case: {{ ctx().iris_case_id }}"

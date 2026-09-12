@@ -1,0 +1,11 @@
+{
+  "description": "Synthetic SMB/RDP lateral movement (Sysmon EventID 3 to internal hosts) — T1021",
+  "source": "sysmon",
+  "expected_detection": "Lateral Movement Detected",
+  "expected_severity": "high",
+  "events": [
+    {"source": "sysmon", "message": "{\"winlog\":{\"event_id\":3,\"event_data\":{\"Image\":\"C:\\\\Windows\\\\System32\\\\svchost.exe\",\"DestinationIp\":\"10.0.0.20\",\"DestinationPort\":445}},\"host\":{\"name\":\"wkstn-99.corp.lab\",\"ip\":\"10.0.0.99\"},\"ComputerName\":\"wkstn-99.corp.lab\"}"},
+    {"source": "sysmon", "message": "{\"winlog\":{\"event_id\":3,\"event_data\":{\"Image\":\"C:\\\\Windows\\\\System32\\\\mstsc.exe\",\"DestinationIp\":\"10.0.0.21\",\"DestinationPort\":3389}},\"host\":{\"name\":\"wkstn-99.corp.lab\",\"ip\":\"10.0.0.99\"},\"ComputerName\":\"wkstn-99.corp.lab\"}"},
+    {"source": "sysmon", "message": "{\"winlog\":{\"event_id\":3,\"event_data\":{\"Image\":\"C:\\\\Windows\\\\System32\\\\svchost.exe\",\"DestinationIp\":\"10.0.0.22\",\"DestinationPort\":22}},\"host\":{\"name\":\"wkstn-99.corp.lab\",\"ip\":\"10.0.0.99\"},\"ComputerName\":\"wkstn-99.corp.lab\"}"}
+  ]
+}
