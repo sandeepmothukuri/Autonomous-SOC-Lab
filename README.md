@@ -70,22 +70,13 @@ The platform is **safe-by-default**. Deterministic security controls remain auth
 ---
 
 # 🏗️ Architecture
+### End-to-End Data Flow
 
 The architecture separates telemetry collection, deterministic detection, response orchestration, investigation and case management into clearly defined layers.
 
 <div align="center">
 
 <img src="architecture/diagram.svg" alt="Autonomous SOC Lab architecture" width="100%">
-
-</div>
-
-### End-to-End Data Flow
-
-The following diagram shows the complete telemetry-to-response path, including collection, SIEM processing, detection, SOAR orchestration, threat intelligence, DFIR investigation and adversary validation.
-
-<div align="center">
-
-<img src="architecture/end-to-end-data-flow.svg" alt="Autonomous SOC Lab — End-to-End Data Flow" width="100%">
 
 </div>
 
