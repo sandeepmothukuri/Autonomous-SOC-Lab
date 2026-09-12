@@ -1,272 +1,896 @@
-# Autonomous-SOC-Lab
+<div align="center">
 
-An open-source, safe-by-default Autonomous SOC research platform
-built on Vector, OpenSearch, ElastAlert2, StackStorm, DFIR-IRIS, MISP,
-Velociraptor, and MITRE Caldera.
+# 🛡️ Autonomous SOC Lab
 
-> **Default mode is `simulation`.** The lab does not perform any
-> containment action until you explicitly set
-> `SOC_RESPONSE_MODE=approval` or `active` and wire real handlers.
-> Management interfaces bind to **127.0.0.1** by default.
+### Enterprise-Style Detection • Investigation • Response • DFIR • Adversary Emulation
+
+[![CI](https://github.com/sandeepmothukuri/Autonomous-SOC-Lab/actions/workflows/validate.yml/badge.svg)](https://github.com/sandeepmothukuri/Autonomous-SOC-Lab/actions)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://docs.docker.com/compose/)
+[![OpenSearch](https://img.shields.io/badge/SIEM-OpenSearch-005EB8?logo=opensearch&logoColor=white)](https://opensearch.org/)
+[![MITRE ATT&CK](https://img.shields.io/badge/MITRE-ATT%26CK-red)](https://attack.mitre.org/)
+[![StackStorm](https://img.shields.io/badge/SOAR-StackStorm-4B8BBE)](https://stackstorm.com/)
+
+**A reproducible open-source SOC engineering platform for building, validating and demonstrating modern detection-and-response operations.**
+
+[Architecture](#-architecture) · [Visual Showcase](#-visual-showcase) · [Detection Engineering](#-detection-engineering) · [SOAR](#-soar-response-automation) · [DFIR](#-dfir--investigation) · [Quick Start](#-quick-start) · [Testing](#-validation--quality)
+
+</div>
 
 ---
 
-## What this project demonstrates
+## 🎯 Project Overview
 
-A complete detection-and-response pipeline that keeps deterministic
-controls authoritative, treats AI/enrichment as advisory, and makes
-response mode an explicit, auditable policy decision:
+**Autonomous SOC Lab** combines SIEM, detection engineering, SOAR, threat intelligence, endpoint DFIR, case management and adversary emulation into a single Docker-based security operations environment.
 
+The project is designed to demonstrate the engineering lifecycle behind a modern SOC:
+
+```text
+Telemetry
+   ↓
+Collection & Normalisation
+   ↓
+Detection Engineering
+   ↓
+Alert Enrichment
+   ↓
+Policy / Decision Gate
+   ↓
+Automated Response
+   ↓
+DFIR Investigation
+   ↓
+Case Management
+   ↓
+Detection Validation & Coverage Measurement
 ```
-Endpoints / logs
-    → Vector     (collection + ECS normalization)
-    → OpenSearch (indexed storage + dashboards)
-    → ElastAlert (deterministic rule-based detection)
-    → StackStorm (SOAR workflows, mode-gated)
-        ├── MISP / AbuseIPDB / ipinfo  (threat intel — optional, offline-safe)
-        ├── Velociraptor               (DFIR collection + isolation)
-        └── DFIR-IRIS                  (case management)
-    → Analyst
+
+The platform is **safe-by-default**. Deterministic security controls remain authoritative, while enrichment or AI-assisted analysis can provide additional context without bypassing response policy.
+
+> **Default response mode: `simulation`** — no containment action is performed unless the operator explicitly enables `approval` or `active` mode and configures the required response handlers.
+
+---
+
+## 🧩 What the Platform Demonstrates
+
+| Capability | Implementation | Purpose |
+|---|---|---|
+| Log collection | Vector | Collection, parsing and normalisation |
+| SIEM | OpenSearch | Search, storage and dashboards |
+| Detection | ElastAlert2 | Deterministic rule-based detections |
+| SOAR | StackStorm | Orchestration and response workflows |
+| Case management | DFIR-IRIS | Incidents, evidence and timelines |
+| Threat intelligence | MISP | IOC enrichment and correlation |
+| Endpoint DFIR | Velociraptor | Live hunts and forensic collection |
+| Adversary emulation | MITRE Caldera | Controlled TTP validation |
+| Detection mapping | MITRE ATT&CK | Technique-level coverage |
+| Deployment | Docker Compose | Reproducible local environment |
+| Quality gates | GitHub Actions + pytest | Automated validation |
+
+---
+
+# 🏗️ Architecture
+
+The architecture separates telemetry collection, deterministic detection, response orchestration, investigation and case management into clearly defined layers.
+
+<div align="center">
+
+<img src="architecture/diagram.svg" alt="Autonomous SOC Lab architecture" width="100%">
+
+</div>
+
+### End-to-End Data Flow
+
+```text
+┌─────────────────────────────────────────────────────────────────────┐
+│                         DATA SOURCES                                │
+│ Windows • Linux • Network • Cloud • Applications • Caldera         │
+└──────────────────────────────┬──────────────────────────────────────┘
+                               │
+                               ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│ Vector                                                            │
+│ Collection → Parsing → Remap / Normalisation → OpenSearch          │
+└──────────────────────────────┬──────────────────────────────────────┘
+                               │
+                               ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│ OpenSearch                                                        │
+│ SIEM • Search • Dashboards • Alert Data                            │
+└──────────────────────────────┬──────────────────────────────────────┘
+                               │
+                               ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│ ElastAlert2                                                       │
+│ ATT&CK-mapped deterministic detections                             │
+└──────────────────────────────┬──────────────────────────────────────┘
+                               │ Webhook
+                               ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│ StackStorm                                                        │
+│ Enrichment → Decision Gate → Response → IRIS Case                 │
+└──────────────┬──────────────────────┬───────────────────────────────┘
+               │                      │
+               ▼                      ▼
+       ┌──────────────┐       ┌─────────────────┐
+       │    MISP      │       │  Velociraptor   │
+       │ Threat Intel │       │    DFIR / EDR   │
+       └──────┬───────┘       └────────┬────────┘
+              │                        │
+              └────────────┬───────────┘
+                           ▼
+                   ┌───────────────┐
+                   │   DFIR-IRIS   │
+                   │ Case / Evidence│
+                   │ Timeline / IOC │
+                   └───────────────┘
+
+MITRE Caldera → Controlled Adversary Emulation → Detection Validation
 ```
 
-Adversary emulation is provided via a safe MITRE Caldera profile
-(non-destructive discovery / execution TTPs only).
+---
 
-## Technology stack
+# 📸 Visual Showcase
 
-| Purpose | Technology |
+The repository includes visual assets for the major SOC components. The PNG files below are the primary visual assets used in this README; the corresponding SVG sources are also retained in `screenshots/` for editable/vector representations.
+
+## SOC Operations Dashboard
+
+<div align="center">
+
+<img src="screenshots/01-soc-dashboard.png" alt="SOC operations dashboard" width="100%">
+
+</div>
+
+**Purpose:** operational view of security events, alert activity, detection status and SOC metrics.
+
+---
+
+## Alert Investigation
+
+<div align="center">
+
+<img src="screenshots/02-alert-panel.png" alt="SOC alert investigation panel" width="100%">
+
+</div>
+
+**Purpose:** investigate suspicious activity with alert context, timeline information and response options.
+
+---
+
+## SOAR Response Workflow
+
+<div align="center">
+
+<img src="screenshots/03-soar-workflow.png" alt="StackStorm SOAR workflow" width="100%">
+
+</div>
+
+**Workflow pattern:**
+
+```text
+Detection
+   ↓
+Alert Normalisation
+   ↓
+Threat Intelligence Enrichment
+   ↓
+Decision Gate
+   ↓
+Simulation / Approval / Active Response
+   ↓
+IRIS Case
+   ↓
+Analyst Investigation
+```
+
+---
+
+## Incident Response & Case Management
+
+<div align="center">
+
+<img src="screenshots/04-incident-case.png" alt="DFIR-IRIS incident case" width="100%">
+
+</div>
+
+**Purpose:** centralise incident context, evidence, indicators and investigation timelines.
+
+---
+
+## Threat Intelligence
+
+<div align="center">
+
+<img src="screenshots/05-threat-intel.png" alt="MISP threat intelligence interface" width="100%">
+
+</div>
+
+**Purpose:** IOC enrichment, correlation and threat-intelligence context for investigations.
+
+---
+
+## Adversary Emulation
+
+<div align="center">
+
+<img src="screenshots/06-attack-simulation.png" alt="MITRE Caldera adversary emulation" width="100%">
+
+</div>
+
+**Purpose:** controlled adversary behaviour is used to exercise detections and measure coverage.
+
+> **Visual evidence note:** these repository assets are presentation/visual representations of the lab interfaces. They should not be interpreted as evidence of a continuously running production deployment. Runtime validation is performed through the documented lab procedures and automated checks.
+
+---
+
+# 🔎 Detection Engineering
+
+Detections are maintained as version-controlled ElastAlert2 rules and mapped to MITRE ATT&CK techniques.
+
+### Current Detection Set
+
+| Detection | ATT&CK | Detection Logic |
+|---|---|---|
+| Brute Force Attack | T1110.001 | Repeated failed authentication from a source |
+| Suspicious PowerShell | T1059.001 | Encoded command / DownloadString / bypass indicators |
+| Lateral Movement | T1021 | Repeated internal RDP / SMB / SSH / WinRM activity |
+| Privilege Escalation | T1548.003 | Sudoers / NOPASSWD and suspicious service-to-shell activity |
+
+Detection rules live under:
+
+```text
+detections/
+├── brute_force.yaml
+├── powershell.yaml
+├── lateral_movement.yaml
+└── privilege_escalation.yaml
+```
+
+### Detection Lifecycle
+
+```text
+Raw Event
+   ↓
+Vector Parsing / Normalisation
+   ↓
+OpenSearch
+   ↓
+ElastAlert2 Rule
+   ↓
+MITRE ATT&CK Mapping
+   ↓
+StackStorm Webhook
+   ↓
+SOAR Workflow
+```
+
+### Detection Engineering Principles
+
+- Version-controlled detection logic
+- ATT&CK technique mapping
+- Explicit field contracts
+- Deterministic alert generation
+- False-positive tuning
+- Automated validation
+- Reproducible synthetic test events
+- Detection-to-response traceability
+
+See [`docs/detection-engineering.md`](docs/detection-engineering.md) for the rule contract and tuning guidance.
+
+---
+
+# ⚡ SOAR Response Automation
+
+StackStorm provides the orchestration layer between detection and response.
+
+A response workflow can perform enrichment, evaluate policy, execute a mode-dependent response and create an IRIS case.
+
+```text
+                     ┌──────────────┐
+                     │ Detection    │
+                     └──────┬───────┘
+                            ↓
+                     ┌──────────────┐
+                     │ Enrichment   │
+                     │ MISP / CTI   │
+                     └──────┬───────┘
+                            ↓
+                     ┌──────────────┐
+                     │ Decision Gate│
+                     └──────┬───────┘
+                            │
+              ┌─────────────┼─────────────┐
+              ↓             ↓             ↓
+        Simulation       Approval       Active
+              │             │             │
+         Log intent     Human gate    Explicit action
+              │             │             │
+              └─────────────┼─────────────┘
+                            ↓
+                     ┌──────────────┐
+                     │   IRIS Case  │
+                     └──────┬───────┘
+                            ↓
+                     Analyst Review
+```
+
+### Response Modes
+
+| Mode | Behaviour |
 |---|---|
-| Log collection & normalization | Vector 0.35 |
-| Storage / search | OpenSearch 2.11 + OpenSearch Dashboards 2.11 |
-| Rule-based detection | ElastAlert2 2.14 |
-| SOAR / workflow engine | StackStorm 3.8 |
-| Case management | DFIR-IRIS v2.4.5 + Postgres 15 |
-| Threat intelligence | MISP (Redis + MySQL 8.0) |
-| DFIR collection & isolation | Velociraptor |
-| Adversary emulation | MITRE Caldera (safe profile) |
-| Deterministic AI-trust model | Python research framework in `src/soc/` |
+| `simulation` | Records intended action and creates investigation context; no containment |
+| `approval` | Prepares response and requires analyst approval |
+| `active` | Executes configured containment handlers explicitly enabled by the operator |
 
-## Quick start
+This model is intended to keep automated response **auditable, policy-controlled and reversible where the connected control plane supports rollback**.
+
+See [`docs/soar.md`](docs/soar.md).
+
+---
+
+# 🕵️ DFIR & Investigation
+
+Velociraptor provides endpoint investigation and forensic collection capabilities, while DFIR-IRIS provides centralized incident management.
+
+Example investigation areas include:
+
+- suspicious PowerShell activity
+- persistence mechanisms
+- network connections
+- process activity
+- endpoint artefacts
+- targeted VQL hunts
+- host isolation workflows when explicitly enabled
+
+Example flow:
+
+```text
+Alert
+  ↓
+StackStorm
+  ↓
+Velociraptor Hunt
+  ↓
+Collected Evidence
+  ↓
+IRIS Case
+  ↓
+Timeline / IOC / Analyst Notes
+```
+
+See [`docs/incident-response.md`](docs/incident-response.md).
+
+---
+
+# 🌐 Threat Intelligence
+
+MISP provides the local threat-intelligence layer.
+
+The platform supports optional enrichment through local and external intelligence sources. External providers can be disabled without preventing the core detection pipeline from operating.
+
+```text
+IOC
+ ↓
+MISP / External Enrichment
+ ↓
+Reputation / Context
+ ↓
+SOAR Decision Gate
+ ↓
+Case Context
+```
+
+See [`docs/threat-intelligence.md`](docs/threat-intelligence.md).
+
+---
+
+# 🧪 Adversary Emulation
+
+MITRE Caldera is used to exercise controlled adversary behaviour against the detection pipeline.
+
+The objective is to validate the complete security lifecycle rather than simply execute attack techniques:
+
+```text
+Adversary Technique
+        ↓
+Endpoint / Network Telemetry
+        ↓
+Detection
+        ↓
+Alert
+        ↓
+Enrichment
+        ↓
+Response
+        ↓
+Investigation
+        ↓
+ATT&CK Coverage Measurement
+```
+
+The default Caldera profile is designed to remain non-destructive. Destructive activities such as ransomware execution, log wiping and credential-dumping operations are deliberately excluded from the safe default profile.
+
+---
+
+# 🎯 MITRE ATT&CK Coverage
+
+The lab maps detection scenarios to ATT&CK techniques to make detection coverage measurable.
+
+| Tactic | Example Coverage |
+|---|---|
+| Initial Access | Phishing / user execution scenarios where configured |
+| Execution | PowerShell and command/scripting interpreter activity |
+| Persistence | Scheduled-task and persistence indicators |
+| Privilege Escalation | SUID / exploit / sudo-related indicators |
+| Defense Evasion | Log-clearing and evasion indicators |
+| Credential Access | Brute-force and credential-access scenarios |
+| Lateral Movement | SMB / WMI / remote-service activity |
+| Exfiltration | Controlled network exfiltration scenarios |
+
+Coverage is treated as an engineering measurement and should be expanded as additional detections and telemetry sources are added.
+
+See [`docs/mitre-coverage.md`](docs/mitre-coverage.md).
+
+---
+
+# 🧠 Automation & AI Trust Model
+
+The platform separates **security decision authority** from optional enrichment or AI-assisted analysis.
+
+```text
+Deterministic Security Controls
+        │
+        ├── Detection
+        ├── Policy
+        ├── Validation
+        └── Response Safety
+        │
+        ▼
+Optional Intelligence / AI Assistance
+        │
+        ▼
+Evidence-Grounded Analyst Context
+```
+
+The design goal is to keep automated reasoning:
+
+- evidence-grounded
+- auditable
+- policy-constrained
+- deterministic at the response boundary
+- safe to disable without breaking core detection
+
+The default Docker deployment does not require an external LLM to operate.
+
+---
+
+# 🔐 Security Model
+
+Security controls are designed for a safe local research environment.
+
+### Default safeguards
+
+- `SOC_RESPONSE_MODE=simulation`
+- Management interfaces bind to `127.0.0.1` by default
+- Credentials are supplied through environment configuration
+- `.env` is excluded from version control
+- `.env.example` uses generated-secret placeholders
+- Static Caldera API keys are rejected by validation
+- Secret-pattern scanning is included in CI
+- Safe Caldera content is non-destructive
+- Active containment requires explicit configuration
+
+### Important lab limitation
+
+OpenSearch security is intentionally simplified in the default isolated lab deployment. Production deployments should enable authentication, TLS, network segmentation, secrets management and the appropriate security plugins before exposing any service beyond the trusted lab environment.
+
+See [`docs/security.md`](docs/security.md).
+
+---
+
+# 🚀 Quick Start
+
+## Prerequisites
+
+Recommended host:
+
+- Docker Engine
+- Docker Compose v2
+- Linux or WSL2
+- 16 GB RAM recommended
+- 50 GB available storage
+
+## 1. Clone the repository
 
 ```bash
 git clone https://github.com/sandeepmothukuri/Autonomous-SOC-Lab.git
 cd Autonomous-SOC-Lab
+```
 
+## 2. Configure secrets
+
+```bash
 cp .env.example .env
-# edit .env and replace every <GENERATE_*> placeholder with a strong
-# random value. You can generate them with:
-#   python -c 'import secrets; print(secrets.token_urlsafe(32))'
+```
 
-bash scripts/health-check.sh
+Replace every `<GENERATE_*>` placeholder with a strong random value.
+
+Generate a secret with:
+
+```bash
+python -c "import secrets; print(secrets.token_urlsafe(32))"
+```
+
+## 3. Start the stack
+
+```bash
 docker compose pull
 docker compose up -d
+```
 
-# Wait ~2 minutes for StackStorm to initialize, then register the pack:
+## 4. Register StackStorm content
+
+```bash
 bash scripts/setup-stackstorm.sh
+```
 
-# Generate synthetic events to exercise the pipeline:
+## 5. Generate test telemetry
+
+```bash
 python scripts/generate-events.py --scenario all
+```
 
-# Run health + end-to-end checks:
+Available scenarios:
+
+```text
+brute_force
+powershell
+lateral_movement
+privilege_escalation
+all
+```
+
+## 6. Validate the deployment
+
+```bash
 bash scripts/health-check.sh
+bash scripts/test-end-to-end.sh
+pytest -q
+python tests/validate_lab.py
+```
+
+---
+
+# 🧪 Lab Exercises
+
+### Exercise 1 — Brute Force Detection
+
+```bash
+python scripts/generate-events.py --scenario brute_force
+```
+
+Expected path:
+
+```text
+Synthetic Authentication Events
+        ↓
+Vector
+        ↓
+OpenSearch
+        ↓
+Brute Force Detection
+        ↓
+StackStorm
+        ↓
+IRIS Case
+```
+
+### Exercise 2 — Suspicious PowerShell
+
+```bash
+python scripts/generate-events.py --scenario powershell
+```
+
+Expected path:
+
+```text
+PowerShell Telemetry
+        ↓
+T1059.001 Detection
+        ↓
+SOAR
+        ↓
+Velociraptor Investigation
+        ↓
+IRIS Case
+```
+
+### Exercise 3 — Lateral Movement
+
+```bash
+python scripts/generate-events.py --scenario lateral_movement
+```
+
+Expected path:
+
+```text
+Remote Service Activity
+        ↓
+T1021 Detection
+        ↓
+StackStorm
+        ↓
+Investigation / Case Creation
+```
+
+### Exercise 4 — Full Pipeline
+
+```bash
+python scripts/generate-events.py --scenario all
 bash scripts/test-end-to-end.sh
 ```
 
-By default every service listens on `127.0.0.1`. Open Dashboards at
-http://127.0.0.1:5601, IRIS at http://127.0.0.1:8000, MISP at
-http://127.0.0.1:8080, Velociraptor at http://127.0.0.1:8889, Caldera
-at http://127.0.0.1:8888.
+This exercises the complete detection-to-case workflow using controlled synthetic telemetry.
 
-## Configuration
+---
 
-All configuration is in `.env` (generated from `.env.example`) and
-the YAML files under `configs/`. Key variables:
+# 🧰 Technology Stack
 
-| Variable | Default | Purpose |
+| Layer | Technology | Role |
 |---|---|---|
-| `SOC_RESPONSE_MODE` | `simulation` | `simulation` / `approval` / `active` |
-| `OPENSEARCH_INITIAL_ADMIN_PASSWORD` | _(set in .env)_ | Unused when security plugin is disabled (lab default) |
-| `ST2_PASSWORD` | _(set)_ | StackStorm admin password |
-| `IRIS_*`, `POSTGRES_*` | _(set)_ | IRIS and Postgres credentials |
-| `MISP_*`, `MYSQL_*` | _(set)_ | MISP credentials |
-| `VELOCIRAPTOR_ADMIN_PASSWORD` | _(set)_ | Velociraptor GUI password |
-| `ABUSEIPDB_API_KEY`, `IPINFO_TOKEN` | empty | Optional; empty ⇒ offline fallback |
-| `*_BIND_ADDRESS` | `127.0.0.1` | Bind address for each service |
+| Collection | Vector | Log collection and normalisation |
+| SIEM | OpenSearch | Event storage, search and dashboards |
+| Detection | ElastAlert2 | Rule-based detection |
+| SOAR | StackStorm | Orchestration and response |
+| Case Management | DFIR-IRIS | Incident lifecycle and evidence |
+| Threat Intelligence | MISP | IOC intelligence and enrichment |
+| Endpoint DFIR | Velociraptor | Endpoint hunts and evidence collection |
+| Adversary Emulation | MITRE Caldera | Controlled TTP execution |
+| Framework | MITRE ATT&CK | Detection coverage mapping |
+| Runtime | Docker Compose | Reproducible service deployment |
+| Testing | pytest / ShellCheck / yamllint | Quality validation |
+| CI/CD | GitHub Actions | Automated repository quality gates |
 
-See `docs/deployment.md` for full deployment guidance.
+---
 
-## Detection engineering
+# ✅ Validation & Quality
 
-Detections are ElastAlert2 YAML rules under `detections/` that operate
-on a single ECS-like schema produced by Vector. Four detections ship
-by default:
+The repository contains automated checks for:
 
-| Rule | MITRE | Logic |
-|---|---|---|
-| Brute Force Attack Detected | T1110.001 | 5 failed_logins in 2 minutes per source.ip |
-| Suspicious PowerShell Execution | T1059.001 | EncodedCommand / DownloadString / Bypass in Script Block logging |
-| Lateral Movement Detected | T1021 | 3 internal RDP/SMB/SSH/WinRM connections in 5 minutes per source |
-| Privilege Escalation Attempt | T1548.003 | Sudoers NOPASSWD use or web-server spawning shell |
+- YAML syntax
+- detection metadata and ATT&CK mappings
+- StackStorm rule/action references
+- workflow references
+- Docker Compose safety invariants
+- environment configuration
+- hardcoded credential patterns
+- static Caldera API keys
+- repository structure
+- Python tests
+- shell scripts
+- YAML linting
+- secret scanning
 
-For the field contract, false-positive handling, and how to add new
-rules see `docs/detection-engineering.md` and `docs/mitre-coverage.md`.
+CI runs these checks automatically on pushes and pull requests.
 
-## SOAR workflows
+```text
+Commit
+  ↓
+GitHub Actions
+  ├── ShellCheck
+  ├── Python Tests
+  ├── YAML Lint
+  ├── Compose Validation
+  ├── Detection / SOAR Validation
+  ├── Structure Validation
+  └── Secret Scan
+        ↓
+    PASS / FAIL
+```
 
-Workflows live under `soar/actions/workflows/` as Orquesta workflows.
-Every workflow reads `SOC_RESPONSE_MODE` and branches accordingly:
+See [`docs/testing.md`](docs/testing.md) and [`docs/validation-matrix.md`](docs/validation-matrix.md).
 
-| Mode | Behavior |
+---
+
+# 📊 SOC Engineering Metrics
+
+A core objective of the project is to move beyond tool integration and measure operational outcomes.
+
+Future and extensible metrics include:
+
+| Metric | Objective |
 |---|---|
-| `simulation` | Logs intended response, opens IRIS case. No changes. |
-| `approval` | Creates IRIS case flagged for analyst sign-off. |
-| `active` | Calls containment APIs (Velociraptor, firewall). Must be explicitly enabled. |
+| MTTD | Mean time to detect |
+| MTTR | Mean time to respond |
+| Detection coverage | ATT&CK technique coverage |
+| False-positive rate | Detection quality |
+| Automation rate | Analyst workload reduction |
+| Containment success | Response effectiveness |
+| Investigation time | DFIR efficiency |
+| Alert reduction | Noise reduction |
+| Analyst hours saved | Operational impact |
 
-External enrichment (AbuseIPDB, ipinfo, MISP) is optional; if a key is
-missing or the service is unreachable, workflows fall back to
-"unknown" enrichment and still create cases.
+---
 
-See `docs/soar.md`.
+# 📁 Repository Structure
 
-## Threat intelligence
-
-* **MISP** runs locally (Redis + MySQL). No feeds are preloaded.
-* **AbuseIPDB / ipinfo** are called when API keys are configured.
-* **Graceful degradation** is enforced at the workflow level.
-* See `docs/threat-intelligence.md`.
-
-## DFIR (Velociraptor + IRIS)
-
-* Velociraptor serves its GUI on http://127.0.0.1:8889.
-* Sample read-only VQL hunts are provided in `velociraptor/hunts/`
-  (suspicious PowerShell, run-key persistence, network connections).
-* Host isolation is only invoked when `SOC_RESPONSE_MODE=active`.
-* All alerts create (or attempt to create) a DFIR-IRIS case.
-* See `docs/incident-response.md`.
-
-## MITRE Caldera
-
-* Safe-by-default adversary profile (`caldera/red_team.yml`) with
-  non-destructive APT29-inspired and pre-stage TTPs.
-* Exercises validate the detection stack end-to-end without modifying
-  endpoint state.
-* Destructive actions (ransomware simulation, log wiping, LSASS
-  dumps) are deliberately excluded.
-
-## Lab exercises
-
-1. Start the stack and generate brute-force events:
-   `python scripts/generate-events.py --scenario brute_force`
-2. Open Dashboards and verify the `logs-*` index contains events.
-3. Wait for ElastAlert to fire (≤ 2× `run_every` = 60 seconds).
-4. Verify the StackStorm webhook was triggered
-   (`docker logs soc-stackstorm | grep soc_lab`).
-5. Open IRIS and confirm the case was created.
-6. Repeat for each scenario: `powershell`, `lateral_movement`,
-   `privilege_escalation`, `all`.
-7. Run a Caldera ability against a connected test agent and confirm
-   the matching detection fires.
-
-## Testing
-
-Static tests run on every commit via GitHub Actions:
-
-```bash
-pytest -q                       # Python + YAML + security + VRL checks
-bash scripts/health-check.sh    # files, compose validity, service reachability
-bash scripts/test-end-to-end.sh # synthetic event + reachability chain
-shellcheck scripts/*.sh         # shell lint
-```
-
-See `docs/testing.md` for details. **54 Python tests and a full static
-validation suite** (`tests/validate_lab.py`) ship with the repo.
-
-## Security model
-
-* Default response mode is `simulation` — no containment actions
-  execute out of the box.
-* All management interfaces bind to 127.0.0.1.
-* No hardcoded credentials. `.env` is gitignored; `.env.example` uses
-  `<GENERATE_*>` placeholders.
-* OpenSearch security plugin is disabled for lab use (auth-free,
-  isolated network). Hardening instructions in `docs/security.md`.
-* Caldera adversary profile is non-destructive.
-* Critical-event routing is deterministic: only events tagged
-  `event.severity = critical` or `alert.rule` by Vector flow to the
-  `alerts-critical-*` index.
-
-## Repository structure
-
-```
-.
-├── architecture/             # architecture diagram (SVG mockup)
-├── caldera/                  # MITRE Caldera safe adversary profile
-├── configs/                  # OpenSearch / Dashboards / ElastAlert / Velociraptor
-├── data/sample_logs/         # synthetic log fixtures for Vector
-├── detections/               # ElastAlert2 detection rules
-├── docs/                     # architecture, deployment, security, playbooks
-├── pipeline/vector.toml      # Vector collection/normalization
-├── scripts/                  # health check, e2e test, event generator, setup
-├── soar/                     # StackStorm pack (rules, actions, workflows)
-├── screenshots/              # UI mockups (SVG, labeled as mockups)
-├── src/soc/                  # deterministic AI-trust research framework
-├── tests/                    # pytest suite + fixtures
-├── velociraptor/hunts/       # sample VQL hunts
+```text
+Autonomous-SOC-Lab/
+│
+├── architecture/
+│   └── diagram.svg
+│
+├── caldera/
+│   └── red_team.yml
+│
+├── configs/
+│   ├── opensearch/
+│   ├── elastalert/
+│   └── ...
+│
+├── detections/
+│   ├── brute_force.yaml
+│   ├── powershell.yaml
+│   ├── privilege_escalation.yaml
+│   └── lateral_movement.yaml
+│
+├── pipeline/
+│   └── vector.toml
+│
+├── screenshots/
+│   ├── 01-soc-dashboard.png
+│   ├── 02-alert-panel.png
+│   ├── 03-soar-workflow.png
+│   ├── 04-incident-case.png
+│   ├── 05-threat-intel.png
+│   ├── 06-attack-simulation.png
+│   └── *.svg
+│
+├── scripts/
+│   ├── health-check.sh
+│   ├── generate-events.py
+│   ├── setup-stackstorm.sh
+│   └── test-end-to-end.sh
+│
+├── soar/
+│   ├── rules/
+│   └── actions/
+│
+├── tests/
+│   ├── fixtures/
+│   └── validate_lab.py
+│
+├── docs/
+│   ├── architecture.md
+│   ├── deployment.md
+│   ├── security.md
+│   ├── detection-engineering.md
+│   ├── soar.md
+│   ├── threat-intelligence.md
+│   ├── incident-response.md
+│   ├── mitre-coverage.md
+│   ├── testing.md
+│   ├── troubleshooting.md
+│   └── validation-matrix.md
+│
 ├── docker-compose.yml
 ├── .env.example
+├── LICENSE
 └── README.md
 ```
 
-> **Visuals note:** The PNG/SVG files in `screenshots/` and
-> `architecture/` are labeled **mockups**. They represent the UI
-> surface area of a deployed lab; they are not live screenshots of the
-> running stack.
+---
 
-## Limitations
+# ⚠️ Scope & Limitations
 
-* OpenSearch security plugin is disabled in the default compose file
-  — the stack is intended for an isolated lab network.
-* Real firewall/EDR/IdP handlers for `active` mode are not shipped;
-  workflows provide HTTP stubs that you must wire to your own control
-  planes.
-* Velociraptor endpoint agents are not pre-installed; distribute them
-  manually per the Velociraptor docs.
-* No AI / LLM integration is included in the Docker stack. The
-  Python research framework in `src/soc/` provides a deterministic,
-  evidence-grounded triage model with a pluggable client interface;
-  wiring a real LLM is left as an explicit integration task (see
-  `docs/ai_trust_model.md` in the Python framework docs).
-* Runtime stack boot could not be validated in this sandbox (no Docker
-  daemon). Static validation is exhaustive; run
-  `bash scripts/test-end-to-end.sh` on a Docker-enabled host to
-  complete runtime validation. See `docs/validation-matrix.md`.
+This repository is an **SOC engineering, automation and research lab**, not a drop-in production SOC deployment.
 
-## Documentation
+Important limitations:
 
-| Document | Purpose |
-|---|---|
-| `docs/architecture.md` | Component diagram and data flow |
-| `docs/deployment.md` | Installation, configuration, response modes |
-| `docs/security.md` | Default guarantees and hardening steps |
-| `docs/detection-engineering.md` | Field contract, tuning, writing new rules |
-| `docs/soar.md` | SOAR workflows, response modes, datastore keys |
-| `docs/threat-intelligence.md` | MISP / AbuseIPDB / ipinfo, offline fallback |
-| `docs/incident-response.md` | Analyst triage playbooks |
-| `docs/mitre-coverage.md` | Technique-by-technique coverage table |
-| `docs/testing.md` | Static + runtime testing guide |
-| `docs/troubleshooting.md` | Common failure modes and fixes |
-| `docs/validation-matrix.md` | What has/has not been validated |
+- The default response mode is simulation.
+- Production EDR, firewall and identity-provider integrations require configuration.
+- Velociraptor endpoint agents must be deployed separately.
+- External threat-intelligence services are optional.
+- The default Docker stack does not require an external LLM.
+- The default OpenSearch security configuration is intended for an isolated lab.
+- Runtime performance and availability depend on the host Docker environment.
 
-## Roadmap
+These limitations are documented intentionally so the project remains reproducible and technically honest.
 
-* Signed / WORM audit log shipping
-* Real EDR/firewall/IdP response handlers with rollback
-* Alert clustering / cross-case correlation
-* Two-person approval for active-mode destructive actions
-* Prometheus metrics endpoint
-* Sigma-rule loader for detections
-* Full end-to-end Caldera → OpenSearch → IRIS exercise
+---
 
-## Author
+# 🛣️ Roadmap
 
-Sandeep Mothukuri. See `LICENSE` (MIT).
+### Detection Engineering
+
+- [ ] Expand ATT&CK coverage
+- [ ] Sigma rule ingestion
+- [ ] Detection regression testing
+- [ ] Detection quality scoring
+- [ ] Cross-event correlation
+
+### Autonomous Operations
+
+- [ ] Evidence-grounded LLM triage
+- [ ] Alert clustering
+- [ ] Investigation planning
+- [ ] Risk-based decisioning
+- [ ] Two-person approval for high-impact actions
+- [ ] Automated rollback verification
+
+### Enterprise Integrations
+
+- [ ] Microsoft Defender
+- [ ] CrowdStrike
+- [ ] Microsoft Sentinel
+- [ ] Splunk
+- [ ] AWS
+- [ ] Azure
+- [ ] Identity providers
+- [ ] Network firewalls
+
+### Observability
+
+- [ ] Prometheus metrics
+- [ ] Grafana dashboards
+- [ ] MTTD / MTTR reporting
+- [ ] Automation effectiveness metrics
+- [ ] ATT&CK coverage reporting
+
+---
+
+# 🎯 Engineering Objective
+
+The long-term objective is to demonstrate the evolution from a conventional alert-driven SOC toward a **policy-governed, evidence-driven autonomous SOC** without sacrificing security controls or analyst oversight.
+
+```text
+Alert-Driven SOC
+       ↓
+Automated SOC
+       ↓
+Evidence-Driven SOC
+       ↓
+Policy-Governed Autonomous SOC
+```
+
+The engineering priorities are:
+
+**Detection quality → Evidence → Automation → Safety → Measurement → Continuous improvement**
+
+---
+
+# 👤 Author
+
+## Sandeep Mothukuri
+
+**Senior SOC Analyst (L3) · Detection Engineering · Threat Hunting · Incident Response · Security Engineering**
+
+Focus areas:
+
+- Security Operations
+- Detection Engineering
+- Threat Hunting
+- Incident Response
+- SIEM / XDR
+- SOAR
+- DFIR
+- MITRE ATT&CK
+- Security Automation
+- AI-Augmented SOC Operations
+
+This repository is maintained as a practical security engineering environment for designing, testing and validating modern SOC capabilities.
+
+---
+
+# 📄 License
+
+MIT License. See [`LICENSE`](LICENSE).
+
+---
+
+<div align="center">
+
+**Built as a practical SOC engineering platform — not a collection of disconnected tool installations.**
+
+</div>
