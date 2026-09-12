@@ -1,9 +1,7 @@
 # =============================================================================
 # vector.toml — Log Ingestion Pipeline
-# Vector collects, parses, and ships logs to OpenSearch
+# Vector collects, parses, enriches, and ships logs to OpenSearch.
 # =============================================================================
-
-# ── Sources ──────────────────────────────────────────────────────────────────
 
 [sources.sysmon]
 type = "file"
@@ -30,8 +28,6 @@ type = "file"
 include = ["/var/log/nginx/access.log"]
 read_from = "beginning"
 
-# ── Transforms ───────────────────────────────────────────────────────────────
-
 [transforms.parse_sysmon]
 type = "remap"
 inputs = ["sysmon"]
@@ -47,15 +43,13 @@ inputs = ["auth_logs"]
 source = '''
 .source = "auth"
 .ingest_timestamp = now()
-# detect failed logins
 if match(string!(.message), r'Failed password') {
   .event.type = "failed_login"
   .event.severity = "medium"
-  user_match = parse_regex(.message, r'for (?:invalid user )?(?P<user>\S+) from (?P<src_ip>\S+)') ?? {}
+  user_match = parse_regex(.message, r'for (?:invalid user )?(?P<user>\\S+) from (?P<src_ip>\\S+)') ?? {}
   .user.name = get!(user_match, ["user"])
   .source.ip = get!(user_match, ["src_ip"])
 }
-# detect successful sudo
 if match(string!(.message), r'sudo:') {
   .event.type = "privilege_use"
   .event.severity = "low"
@@ -69,7 +63,6 @@ source = '''
 . = parse_json!(.message)
 .source = "windows"
 .ingest_timestamp = now()
-# PowerShell detection
 if exists(.winlog.event_id) && .winlog.event_id == 4104 {
   .event.type = "powershell_execution"
   if match(string!(.powershell.script_block_text ?? ""), r'-[Ee]nc') {
@@ -78,12 +71,10 @@ if exists(.winlog.event_id) && .winlog.event_id == 4104 {
     .mitre.technique = "T1059.001"
   }
 }
-# Brute force (4625 = failed logon)
 if exists(.winlog.event_id) && .winlog.event_id == 4625 {
   .event.type = "failed_login"
   .event.severity = "medium"
 }
-# New process (4688)
 if exists(.winlog.event_id) && .winlog.event_id == 4688 {
   .event.type = "process_creation"
 }
@@ -103,16 +94,22 @@ if exists(.source.ip) {
 
 [transforms.add_metadata]
 type = "remap"
-inputs = ["parse_sysmon", "enrich_geoip", "parse_windows"]
+inputs = ["parse_sysmon", "enrich_geoip", "parse_windows", "zeek_conn", "nginx_access"]
 source = '''
-.lab.version = "1.0"
+.lab.version = "1.1"
 .lab.environment = "soc-lab"
 if !exists(.event.severity) {
   .event.severity = "info"
 }
+if !exists(.event.type) {
+  .event.type = "unknown"
+}
 '''
 
-# ── Sinks ────────────────────────────────────────────────────────────────────
+[transforms.only_critical]
+type = "filter"
+inputs = ["add_metadata"]
+condition = '.event.severity == "critical"'
 
 [sinks.opensearch]
 type = "elasticsearch"
@@ -136,10 +133,9 @@ inputs = ["add_metadata"]
 encoding.codec = "json"
 target = "stdout"
 
-# Route critical events to dedicated index
 [sinks.opensearch_critical]
 type = "elasticsearch"
-inputs = ["add_metadata"]
+inputs = ["only_critical"]
 endpoints = ["http://opensearch:9200"]
 index = "alerts-critical-%Y-%m-%d"
 compression = "gzip"
