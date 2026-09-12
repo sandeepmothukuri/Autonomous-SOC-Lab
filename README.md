@@ -227,8 +227,9 @@ This repository is maintained as a practical security engineering environment fo
 
 ---
 
-**Author portfolio:** [github.com/sandeepmothukuri](https://github.com/sandeepmothukuri)
 
-# 📄 License
+### 📄 License
 
 MIT License. See [`LICENSE`](LICENSE).
+
+**Author portfolio:** [github.com/sandeepmothukuri](https://github.com/sandeepmothukuri)
