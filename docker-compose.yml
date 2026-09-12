@@ -4,7 +4,6 @@
 # Usage: docker compose up -d
 # =============================================================================
 
-
 networks:
   soc-net:
     driver: bridge
@@ -22,14 +21,12 @@ volumes:
   velociraptor-data:
 
 services:
-
-  # ── OpenSearch (SIEM Backend) ─────────────────────────────────────────────
   opensearch:
     image: opensearchproject/opensearch:2.11.0
     container_name: soc-opensearch
     environment:
       - discovery.type=single-node
-      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=${OPENSEARCH_INITIAL_ADMIN_PASSWORD:-Soc@Lab2024!}
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=${OPENSEARCH_INITIAL_ADMIN_PASSWORD:?Set OPENSEARCH_INITIAL_ADMIN_PASSWORD in .env}
       - DISABLE_INSTALL_DEMO_CONFIG=true
       - plugins.security.ssl.http.enabled=false
       - OPENSEARCH_JAVA_OPTS=${OPENSEARCH_JAVA_OPTS:--Xms1g -Xmx2g}
@@ -37,8 +34,8 @@ services:
       - opensearch-data:/usr/share/opensearch/data
       - ./configs/opensearch/opensearch.yml:/usr/share/opensearch/config/opensearch.yml:ro
     ports:
-      - "9200:9200"
-      - "9600:9600"
+      - "${OPENSEARCH_BIND_ADDRESS:-127.0.0.1}:9200:9200"
+      - "${OPENSEARCH_BIND_ADDRESS:-127.0.0.1}:9600:9600"
     networks:
       soc-net:
         ipv4_address: 172.20.0.10
@@ -49,7 +46,6 @@ services:
       retries: 5
     restart: unless-stopped
 
-  # ── OpenSearch Dashboards (SIEM UI) ──────────────────────────────────────
   opensearch-dashboards:
     image: opensearchproject/opensearch-dashboards:2.11.0
     container_name: soc-dashboards
@@ -64,13 +60,12 @@ services:
       - ./configs/opensearch/dashboards.yml:/usr/share/opensearch-dashboards/config/opensearch_dashboards.yml:ro
       - opensearch-dashboards-data:/usr/share/opensearch-dashboards/data
     ports:
-      - "5601:5601"
+      - "${DASHBOARDS_BIND_ADDRESS:-127.0.0.1}:5601:5601"
     networks:
       soc-net:
         ipv4_address: 172.20.0.11
     restart: unless-stopped
 
-  # ── Vector (Log Pipeline) ─────────────────────────────────────────────────
   vector:
     image: timberio/vector:0.35.0-debian
     container_name: soc-vector
@@ -78,20 +73,19 @@ services:
       opensearch:
         condition: service_healthy
     environment:
-      - OPENSEARCH_PASSWORD=${OPENSEARCH_INITIAL_ADMIN_PASSWORD:-Soc@Lab2024!}
+      - OPENSEARCH_PASSWORD=${OPENSEARCH_INITIAL_ADMIN_PASSWORD:?Set OPENSEARCH_INITIAL_ADMIN_PASSWORD in .env}
       - VECTOR_LOG=info
     volumes:
       - ./pipeline/vector.toml:/etc/vector/vector.toml:ro
       - /var/log:/var/log:ro
     ports:
-      - "8686:8686"  # Vector API
+      - "${VECTOR_BIND_ADDRESS:-127.0.0.1}:8686:8686"
     networks:
       soc-net:
         ipv4_address: 172.20.0.12
     restart: unless-stopped
     command: ["--config", "/etc/vector/vector.toml"]
 
-  # ── ElastAlert2 (Detection Engine) ───────────────────────────────────────
   elastalert2:
     image: jertel/elastalert2:2.14.0
     container_name: soc-elastalert
@@ -102,8 +96,7 @@ services:
       - ELASTICSEARCH_HOST=opensearch
       - ELASTICSEARCH_PORT=9200
       - ELASTICSEARCH_USERNAME=admin
-      - ELASTICSEARCH_PASSWORD=${OPENSEARCH_INITIAL_ADMIN_PASSWORD:-Soc@Lab2024!}
-      - ELASTALERT_SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL:-}
+      - ELASTICSEARCH_PASSWORD=${OPENSEARCH_INITIAL_ADMIN_PASSWORD:?Set OPENSEARCH_INITIAL_ADMIN_PASSWORD in .env}
     volumes:
       - ./configs/elastalert/config.yaml:/opt/elastalert/config.yaml:ro
       - ./detections:/opt/elastalert/rules:ro
@@ -112,7 +105,6 @@ services:
         ipv4_address: 172.20.0.13
     restart: unless-stopped
 
-  # ── StackStorm (SOAR) ──────────────────────────────────────────────────────
   stackstorm:
     image: stackstorm/stackstorm:3.8.1
     container_name: soc-stackstorm
@@ -120,19 +112,18 @@ services:
       - opensearch
     environment:
       - ST2_AUTH_USERNAME=${ST2_USER:-st2admin}
-      - ST2_AUTH_PASSWORD=${ST2_PASSWORD:-Soc@Lab2024!}
+      - ST2_AUTH_PASSWORD=${ST2_PASSWORD:?Set ST2_PASSWORD in .env}
     volumes:
       - ./soar:/opt/stackstorm/packs/soc_lab:ro
       - stackstorm-data:/opt/stackstorm/data
     ports:
-      - "9101:9101"  # Webhook endpoint
-      - "443:443"    # ST2 API
+      - "${STACKSTORM_BIND_ADDRESS:-127.0.0.1}:9101:9101"
+      - "${STACKSTORM_BIND_ADDRESS:-127.0.0.1}:443:443"
     networks:
       soc-net:
         ipv4_address: 172.20.0.14
     restart: unless-stopped
 
-  # ── DFIR-IRIS (Case Management) ──────────────────────────────────────────
   iris:
     image: ghcr.io/dfir-iris/iriswebapp_app:v2.4.5
     container_name: soc-iris
@@ -143,16 +134,16 @@ services:
       - POSTGRES_PORT=5432
       - POSTGRES_DB=${POSTGRES_DB:-iris_db}
       - POSTGRES_USER=${POSTGRES_USER:-iris}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-Soc@Lab2024!}
-      - IRIS_SECRET_KEY=${IRIS_SECRET_KEY:-change_me_very_long_random_secret_key_here}
-      - IRIS_SECURITY_PASSWORD_SALT=${IRIS_SECURITY_PASSWORD_SALT:-change_me_very_long_random_salt_here}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      - IRIS_SECRET_KEY=${IRIS_SECRET_KEY:?Set IRIS_SECRET_KEY in .env}
+      - IRIS_SECURITY_PASSWORD_SALT=${IRIS_SECURITY_PASSWORD_SALT:?Set IRIS_SECURITY_PASSWORD_SALT in .env}
       - IRIS_ADM_EMAIL=${IRIS_ADMIN_EMAIL:-admin@soc.lab}
       - IRIS_ADM_USERNAME=${IRIS_ADMIN_USERNAME:-admin}
-      - IRIS_ADM_PASSWORD=${IRIS_ADMIN_PASSWORD:-Soc@Lab2024!}
+      - IRIS_ADM_PASSWORD=${IRIS_ADMIN_PASSWORD:?Set IRIS_ADMIN_PASSWORD in .env}
     volumes:
       - iris-data:/home/iris/downloads
     ports:
-      - "8000:8000"
+      - "${IRIS_BIND_ADDRESS:-127.0.0.1}:8000:8000"
     networks:
       soc-net:
         ipv4_address: 172.20.0.15
@@ -163,14 +154,13 @@ services:
     container_name: soc-iris-db
     environment:
       - POSTGRES_USER=${POSTGRES_USER:-iris}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-Soc@Lab2024!}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
       - POSTGRES_DB=${POSTGRES_DB:-iris_db}
     networks:
       soc-net:
         ipv4_address: 172.20.0.16
     restart: unless-stopped
 
-  # ── MISP (Threat Intelligence) ────────────────────────────────────────────
   misp:
     image: ghcr.io/misp/misp-docker/misp-core:latest
     container_name: soc-misp
@@ -179,15 +169,15 @@ services:
     environment:
       - MYSQL_HOST=misp-db
       - MYSQL_USER=${MYSQL_USER:-misp}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-Soc@Lab2024!}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in .env}
       - MYSQL_DATABASE=${MYSQL_DATABASE:-misp}
       - MISP_ADMIN_EMAIL=${MISP_ADMIN_EMAIL:-admin@soc.lab}
-      - MISP_ADMIN_PASSPHRASE=${MISP_ADMIN_PASSWORD:-Soc@Lab2024!}
+      - MISP_ADMIN_PASSPHRASE=${MISP_ADMIN_PASSWORD:?Set MISP_ADMIN_PASSWORD in .env}
       - MISP_BASEURL=${MISP_BASEURL:-http://localhost:8080}
     volumes:
       - misp-data:/var/www/MISP/app/files
     ports:
-      - "8080:80"
+      - "${MISP_BIND_ADDRESS:-127.0.0.1}:8080:80"
     networks:
       soc-net:
         ipv4_address: 172.20.0.17
@@ -197,9 +187,9 @@ services:
     image: mysql:8.0
     container_name: soc-misp-db
     environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-Root@Lab2024!}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env}
       - MYSQL_USER=${MYSQL_USER:-misp}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-Soc@Lab2024!}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in .env}
       - MYSQL_DATABASE=${MYSQL_DATABASE:-misp}
     volumes:
       - misp-db:/var/lib/mysql
@@ -208,32 +198,30 @@ services:
         ipv4_address: 172.20.0.18
     restart: unless-stopped
 
-  # ── Velociraptor (DFIR / EDR) ─────────────────────────────────────────────
   velociraptor:
     image: weslambert/velociraptor:latest
     container_name: soc-velociraptor
     environment:
       - VELOCIRAPTOR_USER=${VELOCIRAPTOR_ADMIN_USER:-admin}
-      - VELOCIRAPTOR_PASSWORD=${VELOCIRAPTOR_ADMIN_PASSWORD:-Soc@Lab2024!}
+      - VELOCIRAPTOR_PASSWORD=${VELOCIRAPTOR_ADMIN_PASSWORD:?Set VELOCIRAPTOR_ADMIN_PASSWORD in .env}
     volumes:
       - velociraptor-data:/opt/velociraptor
     ports:
-      - "8889:8889"  # Web UI
-      - "8001:8000"  # Agent frontend
+      - "${VELOCIRAPTOR_BIND_ADDRESS:-127.0.0.1}:8889:8889"
+      - "${VELOCIRAPTOR_AGENT_BIND_ADDRESS:-127.0.0.1}:8001:8000"
     networks:
       soc-net:
         ipv4_address: 172.20.0.19
     restart: unless-stopped
 
-  # MITRE Caldera (Attack Simulation)
   caldera:
     image: ghcr.io/mitre/caldera:latest
     container_name: soc-caldera
     ports:
-      - "8888:8888"
-      - "7010:7010"
-      - "7011:7011/udp"
-      - "7012:7012"
+      - "${CALDERA_BIND_ADDRESS:-127.0.0.1}:8888:8888"
+      - "${CALDERA_BIND_ADDRESS:-127.0.0.1}:7010:7010"
+      - "${CALDERA_BIND_ADDRESS:-127.0.0.1}:7011:7011/udp"
+      - "${CALDERA_BIND_ADDRESS:-127.0.0.1}:7012:7012"
     volumes:
       - ./caldera:/opt/soc-lab/caldera:ro
     networks:
