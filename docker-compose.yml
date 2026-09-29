@@ -30,6 +30,7 @@ volumes:
   stackstorm-packs:
   stackstorm-config:
   postgres-data:
+  iris-data:
   misp-data:
   misp-db:
   misp-redis-data:
@@ -221,7 +222,7 @@ services:
       - IRIS_SECURITY_PASSWORD_SALT=${IRIS_SECURITY_PASSWORD_SALT:?Set IRIS_SECURITY_PASSWORD_SALT in .env}
       - IRIS_ADM_EMAIL=${IRIS_ADM_EMAIL:-admin@soc.lab}
       - IRIS_ADM_USERNAME=${IRIS_ADM_USERNAME:-admin}
-      - IRIS_ADM_PASSWORD=${IRIS_ADM_PASSWORD:?Set IRIS_ADMIN_PASSWORD in .env}
+      - IRIS_ADM_PASSWORD=${IRIS_ADMIN_PASSWORD:?Set IRIS_ADMIN_PASSWORD in .env}
     volumes:
       - iris-data:/home/iris/downloads
     ports:
