@@ -174,6 +174,96 @@ The repository includes visual architecture diagrams, console dashboards, and hi
 
 ---
 
+## 11. Docker Compose Service Stack Topology
+<div align="center">
+<img src="screenshots/11-docker-compose-topology.png" alt="Docker Compose Service Stack Topology Mockup" width="100%">
+</div>
+
+> **Figure 11:** Docker Compose orchestration view showing all 10 containerized security services (OpenSearch, Dashboards, Vector, ElastAlert2, StackStorm, DFIR-IRIS, PostgreSQL, MISP, Velociraptor, Caldera) running on isolated bridge network `172.20.0.0/24`.
+
+---
+
+## 12. Automated Test Suite & Safety Invariant Validation
+<div align="center">
+<img src="screenshots/12-test-suite-validation.png" alt="Automated Test Suite Validation Mockup" width="100%">
+</div>
+
+> **Figure 12:** Pytest test suite execution displaying 71/71 passing tests validating policy thresholds, deterministic containment boundaries, schema compliance, credential safety, and zero AI execution privileges.
+
+---
+
+## 13. Scenario RT-001: Encoded PowerShell Memory Cradle
+<div align="center">
+<img src="screenshots/13-scenario-rt001-powershell.png" alt="Scenario RT-001 Encoded PowerShell Execution Mockup" width="100%">
+</div>
+
+> **Figure 13:** Detailed breakdown of Scenario RT-001 showing Sysmon Event ID 1 capture of Word spawning obfuscated PowerShell, Vector ECS remap, ElastAlert rule firing, and triage ticket generation in DFIR-IRIS.
+
+---
+
+## 14. Scenario RT-002: C2 Beaconing & Automated Boundary Block
+<div align="center">
+<img src="screenshots/14-scenario-rt002-c2-beaconing.png" alt="Scenario RT-002 C2 Beaconing and Auto-Containment Mockup" width="100%">
+</div>
+
+> **Figure 14:** Scenario RT-002 execution correlating outbound telemetry against MISP threat intelligence, evaluating policy confidence (0.90), and executing automated host network isolation and perimeter firewall null-routing.
+
+---
+
+## 15. Scenario RT-003: SSH Credential Brute Force Mitigation
+<div align="center">
+<img src="screenshots/15-scenario-rt003-brute-force.png" alt="Scenario RT-003 SSH Brute Force Mitigation Mockup" width="100%">
+</div>
+
+> **Figure 15:** Scenario RT-003 frequency detection tracking failed authentications in `/var/log/auth.log`, GeoIP and ASN enrichment, and temporary rate-limiting firewall rule application.
+
+---
+
+## 16. Scenario RT-004: Mimikatz LSASS Dump & DC Isolation
+<div align="center">
+<img src="screenshots/16-scenario-rt004-mimikatz.png" alt="Scenario RT-004 Mimikatz LSASS Dump Mockup" width="100%">
+</div>
+
+> **Figure 16:** Scenario RT-004 detecting unauthorized LSASS memory handles via Sysmon Event ID 10 on the Primary Domain Controller, triggering critical auto-containment and automated forensic memory acquisition.
+
+---
+
+## 17. StackStorm Orquesta Workflow DAG Execution
+<div align="center">
+<img src="screenshots/17-orquesta-workflow-dag.png" alt="StackStorm Orquesta Workflow DAG Execution Mockup" width="100%">
+</div>
+
+> **Figure 17:** Directed Acyclic Graph (DAG) lifecycle of the `auto_respond.yaml` Orquesta workflow displaying signature verification, policy gating, dual containment branches, case generation, and rollback paths.
+
+---
+
+## 18. ElastAlert2 Detection Rule Manager
+<div align="center">
+<img src="screenshots/18-elastalert-detection-rules.png" alt="ElastAlert2 Detection Rule Manager Mockup" width="100%">
+</div>
+
+> **Figure 18:** ElastAlert2 detection rule engine console showing active query intervals, index routing, rule evaluation metrics, and HTTP POST webhook integration to StackStorm.
+
+---
+
+## 19. MISP Threat Intelligence Event Repository
+<div align="center">
+<img src="screenshots/19-misp-threat-events.png" alt="MISP Threat Intelligence Event Repository Mockup" width="100%">
+</div>
+
+> **Figure 19:** MISP event view showing APT threat group attributes, correlated indicator hashes, taxonomy tags (TLP:AMBER), and automated IOC synchronization with SIEM detection filters.
+
+---
+
+## 20. DFIR-IRIS Investigation Ledger & Evidence Timeline
+<div align="center">
+<img src="screenshots/20-dfir-iris-case-details.png" alt="DFIR-IRIS Investigation Ledger and Evidence Timeline Mockup" width="100%">
+</div>
+
+> **Figure 20:** DFIR-IRIS incident case timeline detailing the complete chronological event ledger from initial detection at 13:42:18 UTC to autonomous containment, Velociraptor artifact triage, and analyst sign-off.
+
+---
+
 # 🧰 Technology Stack
 
 | Component | Technology | Version | Purpose in Lab | Internal IP | Exposed Port |

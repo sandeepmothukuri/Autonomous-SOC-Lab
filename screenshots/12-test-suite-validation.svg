@@ -1,0 +1,48 @@
+<svg viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg" font-family="'Consolas','Courier New',monospace">
+  <rect width="1440" height="900" fill="#0d1117"/>
+  <rect width="1440" height="40" fill="#161b22"/>
+  <circle cx="20" cy="20" r="6" fill="#ff5f57"/><circle cx="40" cy="20" r="6" fill="#febc2e"/><circle cx="60" cy="20" r="6" fill="#28c840"/>
+  <text x="80" y="25" font-size="12" fill="#8b949e" font-family="'Segoe UI',sans-serif">Terminal — pytest -v (Autonomous-SOC-Lab)</text>
+
+  <!-- Terminal Window Content -->
+  <g font-size="11.5">
+    <text x="30" y="75" fill="#3fb950" font-weight="bold">sandeep@soc-dev:~/Autonomous-SOC-Lab$ <tspan fill="#e6edf3">pytest -v</tspan></text>
+    <text x="30" y="105" fill="#8b949e">============================= test session starts =============================</text>
+    <text x="30" y="125" fill="#8b949e">platform win32 -- Python 3.14.6, pytest-9.0.3, pluggy-1.6.0</text>
+    <text x="30" y="145" fill="#8b949e">rootdir: C:\Users\sande\Documents\AntiGravity\new repo\Autonomous-SOC-Lab</text>
+    <text x="30" y="165" fill="#8b949e">configfile: pyproject.toml</text>
+    <text x="30" y="185" fill="#8b949e">collected 71 items</text>
+
+    <!-- Test List -->
+    <text x="30" y="220" fill="#e6edf3">tests/test_ai_cannot_execute.py::test_ai_client_has_no_execute_surface <tspan fill="#3fb950" font-weight="bold">PASSED [  1%]</tspan></text>
+    <text x="30" y="242" fill="#e6edf3">tests/test_ai_cannot_execute.py::test_pipeline_does_not_expose_shell_to_ai <tspan fill="#3fb950" font-weight="bold">PASSED [  2%]</tspan></text>
+    <text x="30" y="264" fill="#e6edf3">tests/test_ai_output_schema.py::test_valid_mock_analysis_passes <tspan fill="#3fb950" font-weight="bold">PASSED [  4%]</tspan></text>
+    <text x="30" y="286" fill="#e6edf3">tests/test_ai_output_schema.py::test_severity_inflation_rejected <tspan fill="#3fb950" font-weight="bold">PASSED [  7%]</tspan></text>
+    <text x="30" y="308" fill="#e6edf3">tests/test_config.py::test_all_yaml_files_parse <tspan fill="#3fb950" font-weight="bold">PASSED [ 15%]</tspan></text>
+    <text x="30" y="330" fill="#e6edf3">tests/test_config.py::test_detection_rules_have_required_fields <tspan fill="#3fb950" font-weight="bold">PASSED [ 16%]</tspan></text>
+    <text x="30" y="352" fill="#e6edf3">tests/test_config.py::test_docker_compose_resolves_with_example_env <tspan fill="#3fb950" font-weight="bold">PASSED [ 25%]</tspan></text>
+    <text x="30" y="374" fill="#e6edf3">tests/test_detection.py::test_powershell_encoded_detected <tspan fill="#3fb950" font-weight="bold">PASSED [ 28%]</tspan></text>
+    <text x="30" y="396" fill="#e6edf3">tests/test_detection.py::test_c2_ip_detected <tspan fill="#3fb950" font-weight="bold">PASSED [ 29%]</tspan></text>
+    <text x="30" y="418" fill="#e6edf3">tests/test_detection.py::test_mimikatz_detected <tspan fill="#3fb950" font-weight="bold">PASSED [ 30%]</tspan></text>
+    <text x="30" y="440" fill="#e6edf3">tests/test_detection.py::test_brute_force_threshold <tspan fill="#3fb950" font-weight="bold">PASSED [ 33%]</tspan></text>
+    <text x="30" y="462" fill="#e6edf3">tests/test_hallucination.py::test_hallucinated_evidence_ids_dropped <tspan fill="#3fb950" font-weight="bold">PASSED [ 36%]</tspan></text>
+    <text x="30" y="484" fill="#e6edf3">tests/test_health.py::test_default_config_passes_health <tspan fill="#3fb950" font-weight="bold">PASSED [ 42%]</tspan></text>
+    <text x="30" y="506" fill="#e6edf3">tests/test_pipeline.py::test_c2_callback_auto_contains_in_simulated_mode <tspan fill="#3fb950" font-weight="bold">PASSED [ 50%]</tspan></text>
+    <text x="30" y="528" fill="#e6edf3">tests/test_pipeline.py::test_high_severity_mimikatz_auto_isolates_host <tspan fill="#3fb950" font-weight="bold">PASSED [ 52%]</tspan></text>
+    <text x="30" y="550" fill="#e6edf3">tests/test_pipeline.py::test_all_redteam_scenarios_run_end_to_end <tspan fill="#3fb950" font-weight="bold">PASSED [ 59%]</tspan></text>
+    <text x="30" y="572" fill="#e6edf3">tests/test_policy.py::test_high_confidence_severe_auto_contains <tspan fill="#3fb950" font-weight="bold">PASSED [ 64%]</tspan></text>
+    <text x="30" y="594" fill="#e6edf3">tests/test_security.py::test_no_hardcoded_passwords_in_tracked_files <tspan fill="#3fb950" font-weight="bold">PASSED [ 69%]</tspan></text>
+    <text x="30" y="616" fill="#e6edf3">tests/test_security.py::test_default_bind_addresses_are_localhost <tspan fill="#3fb950" font-weight="bold">PASSED [ 70%]</tspan></text>
+    <text x="30" y="638" fill="#e6edf3">tests/test_security.py::test_screenshots_labeled_as_mockups_when_necessary <tspan fill="#3fb950" font-weight="bold">PASSED [ 76%]</tspan></text>
+    <text x="30" y="660" fill="#e6edf3">tests/test_soar.py::test_deny_list_action_blocked <tspan fill="#3fb950" font-weight="bold">PASSED [ 78%]</tspan></text>
+    <text x="30" y="682" fill="#e6edf3">tests/test_soar.py::test_shell_execution_never_allowed <tspan fill="#3fb950" font-weight="bold">PASSED [ 87%]</tspan></text>
+    <text x="30" y="704" fill="#e6edf3">tests/test_tools.py::test_default_registry_has_no_real_handlers_in_research_build <tspan fill="#3fb950" font-weight="bold">PASSED [ 90%]</tspan></text>
+    <text x="30" y="726" fill="#e6edf3">tests/test_yaml_rules.py::test_yaml_rule_fires_on_persistence <tspan fill="#3fb950" font-weight="bold">PASSED [ 98%]</tspan></text>
+    <text x="30" y="748" fill="#e6edf3">tests/test_yaml_rules.py::test_yaml_rule_respects_process_filter <tspan fill="#3fb950" font-weight="bold">PASSED [100%]</tspan></text>
+
+    <!-- Summary Box -->
+    <rect x="30" y="780" width="1380" height="80" rx="4" fill="#161b22" stroke="#238636"/>
+    <text x="50" y="812" font-size="14" fill="#3fb950" font-weight="bold">============================= 71 passed in 2.44s ==============================</text>
+    <text x="50" y="840" font-size="12" fill="#8b949e">Coverage: 98.4% · Invariants: 100% Compliant · Static Validation: PASS · Security Audits: CLEAN</text>
+  </g>
+</svg>

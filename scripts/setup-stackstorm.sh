@@ -32,6 +32,6 @@ echo "==> Storing datastore keys (placeholders; set real values for live deploy)
 "${Ctl[@]}" key set velociraptor_token "${VELO_API_TOKEN:-}"
 
 echo "==> Reloading rules/actions..."
-"${Ctl[@]}"ctl reload
+docker exec -i soc-stackstorm st2ctl reload
 
 echo "StackStorm setup complete."
